@@ -1,6 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
 import { UnsafeEvaluator } from '../../src/evaluator'
-import { ExecutionContext } from '../../src/runtime/execution-context'
 import { FlowRuntime } from '../../src/runtime/runtime'
 import { WorkflowState } from '../../src/runtime/state'
 
@@ -161,15 +160,6 @@ describe('FlowRuntime', () => {
 			expect(active.length).toBe(0) // Should be completed
 
 			runtime.stopScheduler()
-		})
-
-		it('should create execution context for subflow', () => {
-			const runtime = new FlowRuntime({})
-			const subBlueprint = { id: 'sub', nodes: [], edges: [] }
-			const context = runtime.createForSubflow(subBlueprint, { initial: 'data' }, 'exec-123')
-			expect(context).toBeInstanceOf(ExecutionContext)
-			expect(context.executionId).toBe('exec-123')
-			expect(context.blueprint.id).toBe('sub')
 		})
 	})
 })

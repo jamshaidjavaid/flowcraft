@@ -72,12 +72,6 @@ export interface IRuntime<
 		allPredecessors?: Map<string, Set<string>>,
 		executionId?: string,
 	) => Promise<void>
-	createForSubflow: (
-		subBlueprint: WorkflowBlueprint,
-		initialSubState: Partial<TContext>,
-		executionId: string,
-		signal?: AbortSignal,
-	) => ExecutionContext<TContext, TDependencies>
 	getExecutorForNode: (
 		nodeId: string,
 		context: ExecutionContext<TContext, TDependencies>,

@@ -587,31 +587,6 @@ export class FlowRuntime<TContext extends Record<string, any>, TDependencies ext
 		return this.executorFactory.createExecutorForNode(nodeId, context)
 	}
 
-	public createForSubflow(
-		subBlueprint: WorkflowBlueprint,
-		initialSubState: Partial<TContext>,
-		executionId: string,
-		signal?: AbortSignal,
-	): ExecutionContext<TContext, TDependencies> {
-		const subState = new WorkflowState<TContext>(initialSubState)
-		return new ExecutionContext(
-			subBlueprint,
-			subState,
-			this.registry,
-			executionId,
-			this,
-			{
-				logger: this.logger,
-				eventBus: this.eventBus,
-				serializer: this.serializer,
-				evaluator: this.evaluator,
-				middleware: this.middleware,
-				dependencies: this.dependencies,
-			},
-			signal,
-		)
-	}
-
 	async determineNextNodes(
 		blueprint: WorkflowBlueprint,
 		nodeId: string,
