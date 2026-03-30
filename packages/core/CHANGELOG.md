@@ -1,5 +1,11 @@
 # flowcraft
 
+## 2.9.1
+
+### Patch Changes
+
+- Fix edge transforms and export built-in node classes for easier composition
+
 ## 2.9.0
 
 ### Minor Changes
