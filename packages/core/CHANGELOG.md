@@ -1,5 +1,26 @@
 # flowcraft
 
+## 2.9.0
+
+### Minor Changes
+
+- This release introduces convenience methods to simplify workflow execution and improves reliability of sleep/resume functionality.
+  Key improvements:
+
+  Features:
+
+  - Added FlowBuilder.run() and FlowBuilder.resume() methods that automatically handle function registry passing, reducing boilerplate code
+  - Enhanced WorkflowScheduler to properly store and restore function registries during auto-resume operations
+
+  Fixes:
+
+  - Fixed SleepNode to correctly preserve output passthrough when transitioning between sleep and resume states
+  - Removed unused createForSubflow method from FlowRuntime that was causing confusion
+
+  Docs:
+
+  - Documented FlowBuilder.run/resume and WorkflowScheduler APIs
+
 ## 2.8.1
 
 ### Patch Changes
