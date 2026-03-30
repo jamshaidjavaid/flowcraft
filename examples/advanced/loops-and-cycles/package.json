@@ -1,0 +1,17 @@
+{
+	"name": "@example/loops-and-cycles",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"start": "tsx src/main.ts",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"flowcraft": "workspace:*"
+	},
+	"devDependencies": {
+		"@types/node": "^25.5.0",
+		"tsx": "^4.21.0",
+		"typescript": "^6.0.2"
+	}
+}

@@ -127,7 +127,19 @@ const flow = createFlow('conditional-loop')
 When a loop controller has multiple outgoing edges with conditions, all conditional edges are evaluated first. If any condition evaluates to true, the corresponding edge is taken. This allows the loop to exit early based on runtime conditions.
 
 > [!NOTE]
-> The [`.loop()`](/api/flow#loop-id-options) method automatically configures the `joinStrategy` of the loop's start and end nodes to `'any'` so they can be re-executed on each iteration.
+> The loop controller node is configured with `joinStrategy: 'any'` so it can be re-entered on each iteration. If your loop body has multiple nodes and the loop's start node has more than one incoming edge (e.g., from an external predecessor *and* the loop's back-edge), you may need to add an explicit edge to the loop controller to prevent a join deadlock:
+>
+> ```typescript
+> // Without this edge, 'initialize' -> 'loop-body-start' has no path
+> // through the loop controller, so 'loop-body-start' never becomes ready.
+> .edge('initialize', 'myLoop') // Entry edge to the loop controller
+> .edge('myLoop', 'done')       // Break edge
+> .loop('myLoop', {
+> 	startNodeId: 'loop-body-start',
+> 	endNodeId: 'loop-body-end',
+> 	condition: 'count < 5',
+> })
+> ```
 
 > [!INFO]
 > `joinStrategy` decides how a node should be executed when it has multiple predecessors:

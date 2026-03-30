@@ -4,10 +4,6 @@ As workflows grow in complexity, it becomes useful to break them down into small
 
 A subflow is a standard [`WorkflowBlueprint`](/api/flow#workflowblueprint-interface) that can be executed as a single node within another (parent) workflow. This allows you to encapsulate logic, promote reuse, and keep your main workflow graphs clean and organized.
 
-## Fluent API
-
-A subflow is a standard [`WorkflowBlueprint`](/api/flow#workflowblueprint-interface) that can be executed as a single node within another (parent) workflow. This allows you to encapsulate logic, promote reuse, and keep your main workflow graphs clean and organized.
-
 ## With the Compiler
 
 When you import and await another `/** @flow */` function, the compiler automatically creates a subflow relationship for you:
@@ -39,7 +35,7 @@ This imperative code compiles to the same subflow structure as the Fluent API ex
 
 ## The `subflow` Node
 
-You can run a subflow by defining a node with `uses: 'subflow'`. This is a built-in node type that the [`FlowRuntime`](/api/runtime#flowruntime-class) knows how to handle.
+You can run a subflow using the exported `SubflowNode` class with the builder API, or by defining a node with `uses: 'subflow'` in a raw blueprint. The `SubflowNode` approach is recommended for type safety.
 
 The `params` for a subflow node are critical:
 -   **`blueprintId`**: The ID of the [`WorkflowBlueprint`](/api/flow#workflowblueprint-interface) to execute. This blueprint must be available in the [`FlowRuntime`](/api/runtime#flowruntime-class)'s `blueprints` registry.
@@ -69,9 +65,11 @@ export const mathSubflowBlueprint = createFlow('math-subflow')
 
 #### 2. Define the Parent Workflow
 
+Use the exported `SubflowNode` class to register a subflow node with full type safety:
+
 ```typescript
 // parent-flow.ts
-import { createFlow } from 'flowcraft'
+import { createFlow, SubflowNode } from 'flowcraft'
 
 export const parentFlow = createFlow('parent-workflow')
 	.node('prepare-data', async ({ context }) => {
@@ -80,8 +78,7 @@ export const parentFlow = createFlow('parent-workflow')
 		await context.set('val2', 20)
 		return { output: 'Data ready' }
 	})
-	.node('run-math', {
-		uses: 'subflow', // Use the built-in subflow runner
+	.node('run-math', SubflowNode, {
 		params: {
 			blueprintId: 'math-subflow',
 			// Map parent context keys to subflow context keys
@@ -182,7 +179,7 @@ export const approvalSubflow = createFlow('approval-subflow')
   .toBlueprint()
 
 // parent-flow.ts
-import { createFlow } from 'flowcraft'
+import { createFlow, SubflowNode } from 'flowcraft'
 
 export const parentFlow = createFlow('parent-workflow')
   .node('prepare', async ({ context }) => {
@@ -190,8 +187,7 @@ export const parentFlow = createFlow('parent-workflow')
     return { output: 'Prepared' }
   })
   .edge('prepare', 'subflow-node')
-  .node('subflow-node', {
-    uses: 'subflow',
+  .node('subflow-node', SubflowNode, {
     params: {
       blueprintId: 'approval-subflow',
       inputs: { data: 'request' }

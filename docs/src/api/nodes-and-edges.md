@@ -18,13 +18,33 @@ interface NodeDefinition {
 
 ### Built-in Node Types
 
-Flowcraft provides several built-in node types for common patterns:
+Flowcraft provides several built-in node types for common patterns. Each is available as a string key for raw blueprints, and as an exported class for use with the builder API (import from `'flowcraft'`):
 
-- **`wait`**: Pauses workflow execution for external input (human-in-the-loop).
-- **`subflow`**: Executes a nested workflow.
-- **`batch-scatter`**: Splits an array for parallel processing.
-- **`batch-gather`**: Collects results from parallel workers.
-- **`loop-controller`**: Manages iterative loops.
+| Class | String Key | Description |
+|-------|-----------|-------------|
+| `SubflowNode` | `subflow` | Executes a nested workflow. |
+| `WaitNode` | `wait` | Pauses workflow execution for external input (human-in-the-loop). |
+| `SleepNode` | `sleep` | Pauses execution for a specified duration. |
+| `WebhookNode` | `webhook` | Listens for an external HTTP request to resume execution. |
+| `BatchScatterNode` | `batch-scatter` | Splits an array for parallel processing. |
+| `BatchGatherNode` | `batch-gather` | Collects results from parallel workers. |
+| *(function)* | `loop-controller` | Manages iterative loops (created automatically by [`.loop()`](/api/flow#loop-id-options)). |
+
+Example using the builder API:
+
+```typescript
+import { createFlow, SubflowNode } from 'flowcraft'
+
+const flow = createFlow('my-flow')
+	.node('start', startNode)
+	.node('run-subflow', SubflowNode, {
+		params: {
+			blueprintId: 'child-flow',
+			inputs: { data: 'startData' },
+		},
+	})
+	.edge('start', 'run-subflow')
+```
 
 ## `EdgeDefinition` Interface
 
