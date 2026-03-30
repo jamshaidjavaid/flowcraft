@@ -462,9 +462,12 @@ export class FlowRuntime<TContext extends Record<string, any>, TDependencies ext
 			await contextImpl.delete(subflowStateKey as any)
 		}
 
-		workflowState.addCompletedNode(awaitingNodeId, resumeData.output)
+		const existingOutput = (await workflowState.getContext().get(`_outputs.${awaitingNodeId}`)) as any
+		const nodeOutput = resumeData.output !== undefined ? resumeData.output : existingOutput
+		workflowState.addCompletedNode(awaitingNodeId, nodeOutput)
 
-		const nextSteps = await this.determineNextNodes(blueprint, awaitingNodeId, resumeData, contextImpl, executionId)
+		const nodeResult = { output: nodeOutput }
+		const nextSteps = await this.determineNextNodes(blueprint, awaitingNodeId, nodeResult, contextImpl, executionId)
 
 		if (nextSteps.length === 0) {
 			workflowState.clearAwaiting(awaitingNodeId)
@@ -477,7 +480,7 @@ export class FlowRuntime<TContext extends Record<string, any>, TDependencies ext
 		const allPredecessors = traverserForResume.getAllPredecessors()
 
 		for (const { node, edge } of nextSteps) {
-			await this.applyEdgeTransform(edge, resumeData, node, contextImpl, allPredecessors, executionId)
+			await this.applyEdgeTransform(edge, nodeResult, node, contextImpl, allPredecessors, executionId)
 		}
 
 		const traverser = GraphTraverser.fromState(blueprint, workflowState)

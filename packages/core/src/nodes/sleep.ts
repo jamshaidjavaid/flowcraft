@@ -2,10 +2,7 @@ import { BaseNode } from '../node'
 import type { NodeContext, NodeResult } from '../types'
 
 export class SleepNode extends BaseNode {
-	async exec(
-		_prepResult: any,
-		context: NodeContext<Record<string, any>, any, any>,
-	): Promise<Omit<NodeResult, 'error'>> {
+	async exec(prepResult: any, context: NodeContext<Record<string, any>, any, any>): Promise<Omit<NodeResult, 'error'>> {
 		const durationParam = this.params?.duration as string | number
 
 		let durationMs: number
@@ -51,6 +48,6 @@ export class SleepNode extends BaseNode {
 			wakeUpAt,
 		})
 
-		return { output: undefined }
+		return { output: prepResult }
 	}
 }
