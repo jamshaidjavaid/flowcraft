@@ -28,8 +28,8 @@
 		"dist"
 	],
 	"scripts": {
-		"dev": "tsdown --watch",
-		"build": "tsdown",
+		"dev": "tsdown --watch --config-loader unrun",
+		"build": "tsdown --config-loader unrun",
 		"typecheck": "tsc --noEmit",
 		"test": "echo \"Error: no test specified\" && exit 0"
 	},
