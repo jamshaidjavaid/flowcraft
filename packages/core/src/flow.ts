@@ -1,5 +1,14 @@
 import { isNodeClass } from './node'
-import type { EdgeDefinition, NodeClass, NodeDefinition, NodeFunction, UIGraph, WorkflowBlueprint } from './types'
+import type { FlowRuntime } from './runtime/runtime'
+import type {
+	EdgeDefinition,
+	NodeClass,
+	NodeDefinition,
+	NodeFunction,
+	UIGraph,
+	WorkflowBlueprint,
+	WorkflowResult,
+} from './types'
 
 /**
  * Generates a deterministic hash for a function based on its source code and a unique counter.
@@ -281,6 +290,46 @@ export class FlowBuilder<
 
 	getFunctionRegistry() {
 		return this.functionRegistry
+	}
+
+	/**
+	 * Runs this flow on the given runtime, automatically passing the function registry.
+	 * Convenience wrapper around `runtime.run(blueprint, initialState, { functionRegistry })`.
+	 */
+	async run(
+		runtime: FlowRuntime<TContext, TDependencies>,
+		initialState: Partial<TContext> | string = {},
+		options?: {
+			strict?: boolean
+			signal?: AbortSignal
+			concurrency?: number
+		},
+	): Promise<WorkflowResult<TContext>> {
+		return runtime.run(this.toBlueprint(), initialState, {
+			...options,
+			functionRegistry: this.functionRegistry,
+		})
+	}
+
+	/**
+	 * Resumes this flow on the given runtime, automatically passing the function registry.
+	 * Convenience wrapper around `runtime.resume(blueprint, ...)`.
+	 */
+	async resume(
+		runtime: FlowRuntime<TContext, TDependencies>,
+		serializedContext: string,
+		resumeData: { output?: any; action?: string },
+		nodeId?: string,
+		options?: {
+			strict?: boolean
+			signal?: AbortSignal
+			concurrency?: number
+		},
+	): Promise<WorkflowResult<TContext>> {
+		return runtime.resume(this.toBlueprint(), serializedContext, resumeData, nodeId, {
+			...options,
+			functionRegistry: this.functionRegistry,
+		})
 	}
 
 	toGraphRepresentation(): UIGraph {

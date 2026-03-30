@@ -15,16 +15,13 @@ describe('SleepNode output passthrough', () => {
 			.edge('pause', 'double')
 
 		const runtime = new FlowRuntime({})
-		const blueprint = flow.toBlueprint()
 
-		const result1 = await runtime.run(blueprint, {}, { functionRegistry: flow.getFunctionRegistry() })
+		const result1 = await flow.run(runtime)
 		expect(result1.status).toBe('awaiting')
 
 		await new Promise((resolve) => setTimeout(resolve, 20))
 
-		const result2 = await runtime.resume(blueprint, result1.serializedContext, {}, 'pause', {
-			functionRegistry: flow.getFunctionRegistry(),
-		})
+		const result2 = await flow.resume(runtime, result1.serializedContext, {}, 'pause')
 		expect(result2.status).toBe('completed')
 		expect(result2.context['_outputs.double']).toBe(84)
 	})
@@ -51,7 +48,7 @@ describe('SleepNode output passthrough', () => {
 		// Start scheduler with fast check interval for testing
 		runtime.startScheduler(50)
 
-		const result = await runtime.run(blueprint, {}, { functionRegistry: flow.getFunctionRegistry() })
+		const result = await flow.run(runtime)
 		expect(result.status).toBe('awaiting')
 
 		// The scheduler will detect the expired timer and call resume automatically
@@ -62,7 +59,9 @@ describe('SleepNode output passthrough', () => {
 
 		// Retrieve the result from the scheduler's auto-resume
 		const executionId = result.context._executionId as string
-		const resumed = runtime.scheduler.getResumeResult(executionId)!
+		const resumed = runtime.scheduler.getResumeResult(executionId)
+		expect(resumed).toBeDefined()
+		if (!resumed) return
 		expect(resumed.status).toBe('completed')
 		expect(resumed.context['_outputs.double']).toBe(84)
 
