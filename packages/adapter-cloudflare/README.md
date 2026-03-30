@@ -15,7 +15,7 @@ npm install @flowcraft/cloudflare-adapter
 
 - **Distributed Execution** - Run workflows across multiple Cloudflare Workers with reliable job distribution
 - **Durable State** - Workflow state persists in Durable Objects, surviving worker restarts
-- **Fan-in Joins** - Support for both "all" and "any" join strategies with distributed coordination via KV
+- **Atomic Coordination** - Support for "all" and "any" join strategies with atomic distributed coordination via Durable Objects
 - **Workflow Reconciliation** - Automatically detect and resume stalled workflows
 - **Status Tracking** - Real-time workflow status updates in KV
 - **TypeScript Support** - Full TypeScript support with type definitions included
@@ -24,20 +24,21 @@ npm install @flowcraft/cloudflare-adapter
 
 - Cloudflare Workers account
 - Cloudflare Queues enabled
-- Cloudflare KV namespace for coordination
 - Cloudflare KV namespace for status tracking
+- Durable Object for context and atomic coordination
 
 ## Usage
 
 ### 1. Set up your Cloudflare resources
 
 ```bash
-# Create KV namespaces
-wrangler kv:namespace create "flowcraft-coordination"
+# Create a KV namespace for status
 wrangler kv:namespace create "flowcraft-status"
 
 # Create a queue
 wrangler queues create "flowcraft-jobs"
+
+# Define a Durable Object class in your Worker (see Durable Object Setup)
 ```
 
 ### 2. Configure your Worker
@@ -47,10 +48,6 @@ wrangler queues create "flowcraft-jobs"
 name = "flowcraft-worker"
 main = "src/index.ts"
 compatibility_date = "2024-01-01"
-
-[[kv_namespaces]]
-binding = "COORDINATION"
-id = "your-coordination-namespace-id"
 
 [[kv_namespaces]]
 binding = "STATUS"
@@ -64,16 +61,19 @@ queue = "flowcraft-jobs"
 ### 3. Create the adapter
 
 ```typescript
-import { CloudflareQueueAdapter, KVCoordinationStore } from '@flowcraft/cloudflare-adapter'
+import { CloudflareQueueAdapter, DurableObjectCoordinationStore } from '@flowcraft/cloudflare-adapter'
 
 export interface Env {
-	COORDINATION: KVNamespace
 	STATUS: KVNamespace
 	JOBS: Queue
 }
 
-const coordinationStore = new KVCoordinationStore({
-	namespace: env.COORDINATION,
+// Note: In a real Worker, you'd get the Durable Object stub from env
+const mockStorage = { /* your Durable Object storage */ }
+
+// Use DurableObjectCoordinationStore for atomic fan-in joins
+const coordinationStore = new DurableObjectCoordinationStore({
+	namespace: mockStorage,
 })
 
 const adapter = new CloudflareQueueAdapter({
@@ -83,8 +83,7 @@ const adapter = new CloudflareQueueAdapter({
 	},
 	coordinationStore,
 	queue: env.JOBS,
-	durableObjectStorage: env.durableObjectStorage,
-	kvNamespace: env.COORDINATION,
+	durableObjectStorage: mockStorage,
 	statusKVNamespace: env.STATUS,
 	queueName: 'flowcraft-jobs',
 })
@@ -96,9 +95,14 @@ const adapter = new CloudflareQueueAdapter({
 export default {
 	async queue(batch: MessageBatch, env: Env): Promise<void> {
 		for (const message of batch.messages) {
-			const job = message.body as JobPayload
-			await adapter.handleJob(job)
-			message.ack()
+			try {
+				const job = message.body as JobPayload
+				await adapter.handleJob(job)
+				message.ack()
+			} catch (error) {
+				console.error('Failed to process job:', error)
+				message.nack()
+			}
 		}
 	},
 }
@@ -160,28 +164,16 @@ The main adapter class for distributed workflow execution.
 #### Constructor Options
 
 - `runtimeOptions` - Flowcraft runtime options (blueprints, registry, etc.)
-- `coordinationStore` - KV-based coordination store for distributed locking
+- `coordinationStore` - Durable Object-based coordination store for atomic distributed locking
 - `queue` - Cloudflare Queue for job distribution
 - `durableObjectStorage` - Durable Object storage for context persistence
-- `kvNamespace` - KV namespace for coordination store
 - `statusKVNamespace` - KV namespace for workflow status tracking
 - `queueName` - Name of the Cloudflare Queue
 
 #### Methods
 
-- `start()` - Start polling for jobs (if using pull-based consumption)
-- `stop()` - Stop polling for jobs
+- `handleJob(job)` - Process a single job from the queue (use in your queue handler)
 - `reconcile(runId)` - Reconcile a workflow run after interruption
-
-### KVCoordinationStore
-
-A coordination store implementation using Cloudflare KV.
-
-```typescript
-const store = new KVCoordinationStore({
-	namespace: kvNamespace,
-})
-```
 
 ### DurableObjectContext
 
@@ -206,10 +198,9 @@ Uses Durable Objects for context storage. Each workflow run has its own Durable 
 
 ### Coordination
 
-Uses Cloudflare KV for distributed coordination:
-- Fan-in join counting
-- Distributed locking for "any" joins
-- Workflow reconciliation
+Uses Durable Objects for atomic distributed coordination:
+- Atomic fan-in join counting
+- Atomic distributed locking for "any" joins
 
 ### Status Tracking
 
@@ -224,8 +215,8 @@ Unlike other Flowcraft adapters that use Docker-based Testcontainers for testing
 
 1. Uses Miniflare for local development and testing
 2. Requires Cloudflare-specific runtime environments
-3. Uses KV instead of DynamoDB/Redis for coordination
-4. Uses Durable Objects instead of database tables for context
+3. Uses Durable Objects for coordination instead of Redis/DynamoDB
+4. Uses Durable Objects for context instead of database tables
 
 ## License
 

@@ -1,12 +1,11 @@
 import type { AdapterOptions, JobPayload, WorkflowResult } from 'flowcraft'
 import { BaseDistributedAdapter } from 'flowcraft'
 import { DurableObjectContext, type DurableObjectStorage } from './context'
-import type { KVCoordinationStoreOptions, KVNamespace } from './store'
+import type { KVNamespace } from './store'
 
 export interface CloudflareQueueAdapterOptions extends AdapterOptions {
 	queue: CloudflareQueue
 	durableObjectStorage: DurableObjectStorage
-	kvNamespace: KVNamespace
 	queueName: string
 	statusKVNamespace: KVNamespace
 	statusPrefix?: string
@@ -23,18 +22,14 @@ function getStatusKey(runId: string, prefix = 'flowcraft:status:'): string {
 export class CloudflareQueueAdapter extends BaseDistributedAdapter {
 	private readonly queue: CloudflareQueue
 	private readonly durableObjectStorage: DurableObjectStorage
-	private readonly kvNamespace: KVNamespace
 	private readonly queueName: string
 	private readonly statusKVNamespace: KVNamespace
 	private readonly statusPrefix: string
-	private isPolling = false
-	private pollInterval?: ReturnType<typeof setInterval>
 
 	constructor(options: CloudflareQueueAdapterOptions) {
 		super(options)
 		this.queue = options.queue
 		this.durableObjectStorage = options.durableObjectStorage
-		this.kvNamespace = options.kvNamespace
 		this.queueName = options.queueName
 		this.statusKVNamespace = options.statusKVNamespace
 		this.statusPrefix = options.statusPrefix ?? 'flowcraft:status:'
@@ -85,41 +80,63 @@ export class CloudflareQueueAdapter extends BaseDistributedAdapter {
 		throw new Error('registerWebhookEndpoint not implemented for CloudflareAdapter')
 	}
 
-	protected processJobs(handler: (job: JobPayload) => Promise<void>): void {
-		if (this.isPolling) {
-			this.logger.warn('[CloudflareQueueAdapter] Polling is already active.')
-			return
-		}
-		this.isPolling = true
-		this.logger.info('[CloudflareQueueAdapter] Worker starting to poll for jobs...')
-
-		this.poll(handler)
+	/**
+	 * Public API for processing a single job message from Cloudflare Queues.
+	 * Use this in your Worker's queue handler:
+	 *
+	 * ```typescript
+	 * export default {
+	 *   async queue(batch: MessageBatch, env: Env): Promise<void> {
+	 *     for (const message of batch.messages) {
+	 *       try {
+	 *         const job = message.body as JobPayload
+	 *         await adapter.handleJob(job)
+	 *         message.ack()
+	 *       } catch (error) {
+	 *         console.error('Failed to process job:', error)
+	 *         message.nack()
+	 *       }
+	 *     }
+	 *   },
+	 * }
+	 * ```
+	 */
+	public async handleJob(job: JobPayload): Promise<void> {
+		await super.handleJob(job)
 	}
 
-	private async poll(handler: (job: JobPayload) => Promise<void>): Promise<void> {
-		this.pollInterval = setInterval(async () => {
-			await this.fetchAndProcessMessages(handler)
-		}, 5000)
-
-		await this.fetchAndProcessMessages(handler)
+	/**
+	 * Polling is not supported in Cloudflare Workers environment.
+	 * Cloudflare Queues work via push (Workers queue handler), not pull.
+	 * Use handleJob() in your queue handler instead.
+	 */
+	protected processJobs(_handler: (job: JobPayload) => Promise<void>): void {
+		this.logger.error(
+			'[CloudflareQueueAdapter] processJobs() is not supported in Cloudflare Workers. ' +
+				'Use handleJob() in your queue handler instead.',
+		)
+		throw new Error(
+			'processJobs() is not supported in Cloudflare Workers. ' + 'Use handleJob() in your queue handler instead.',
+		)
 	}
 
-	private async fetchAndProcessMessages(_handler: (job: JobPayload) => Promise<void>): Promise<void> {
-		// In a real implementation, this would use Cloudflare's queue consumer API
-		// For now, this is a placeholder that can be extended
-		// The actual queue consumption would typically be triggered by the Cloudflare runtime
+	/**
+	 * Polling is not supported. Use handleJob() in queue handler.
+	 */
+	public start(): void {
+		this.logger.error(
+			'[CloudflareQueueAdapter] start() is not supported in Cloudflare Workers. ' +
+				'Use handleJob() in your queue handler instead.',
+		)
+		throw new Error(
+			'start() is not supported in Cloudflare Workers. ' + 'Use handleJob() in your queue handler instead.',
+		)
 	}
 
+	/**
+	 * Polling is not supported. Use handleJob() in queue handler.
+	 */
 	public stop(): void {
-		this.logger.info('[CloudflareQueueAdapter] Stopping worker polling.')
-		this.isPolling = false
-		if (this.pollInterval) {
-			clearInterval(this.pollInterval)
-			this.pollInterval = undefined
-		}
+		this.logger.warn('[CloudflareQueueAdapter] stop() is a no-op in Cloudflare Workers.')
 	}
-}
-
-export function createKVCoordinationStoreOptions(namespace: KVNamespace): KVCoordinationStoreOptions {
-	return { namespace }
 }

@@ -6,6 +6,10 @@ export interface CloudflareReconcilerOptions {
 	statusKVNamespace: KVNamespace
 	statusPrefix?: string
 	stalledThresholdSeconds: number
+	logger?: {
+		info: (message: string, meta?: Record<string, any>) => void
+		error: (message: string, meta?: Record<string, any>) => void
+	}
 }
 
 export interface ReconciliationStats {
@@ -15,7 +19,13 @@ export interface ReconciliationStats {
 }
 
 export function createCloudflareReconciler(options: CloudflareReconcilerOptions) {
-	const { adapter, statusKVNamespace, statusPrefix = 'flowcraft:status:', stalledThresholdSeconds } = options
+	const {
+		adapter,
+		statusKVNamespace,
+		statusPrefix = 'flowcraft:status:',
+		stalledThresholdSeconds,
+		logger = (adapter as any).logger,
+	} = options
 
 	return {
 		async run(): Promise<ReconciliationStats> {
@@ -41,12 +51,16 @@ export function createCloudflareReconciler(options: CloudflareReconcilerOptions)
 					if (status.status === 'running' && status.lastUpdated < thresholdTimestamp) {
 						stalledRunIds.push(runId)
 					}
-				} catch {}
+				} catch (parseError) {
+					logger?.warn(`[CloudflareReconciler] Failed to parse status for run ${runId}:`, { parseError })
+				}
 			}
 
 			if (stalledRunIds.length === 0) {
 				return stats
 			}
+
+			logger?.info(`[CloudflareReconciler] Found ${stalledRunIds.length} stalled runs`)
 
 			for (const runId of stalledRunIds) {
 				stats.stalledRuns++
@@ -54,11 +68,11 @@ export function createCloudflareReconciler(options: CloudflareReconcilerOptions)
 					const enqueued = await (adapter as any).reconcile(runId)
 					if (enqueued.size > 0) {
 						stats.reconciledRuns++
-						console.log(`[CloudflareReconciler] Resumed run ${runId}, enqueued nodes: ${[...enqueued].join(', ')}`)
+						logger?.info(`[CloudflareReconciler] Resumed run ${runId}, enqueued nodes: ${[...enqueued].join(', ')}`)
 					}
 				} catch (error) {
 					stats.failedRuns++
-					console.error(`[CloudflareReconciler] Failed to reconcile run ${runId}:`, error)
+					logger?.error(`[CloudflareReconciler] Failed to reconcile run ${runId}:`, { error })
 				}
 			}
 

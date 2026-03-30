@@ -2,7 +2,7 @@ import type { IAsyncContext, PatchOperation } from 'flowcraft'
 
 export interface DurableObjectStorage {
 	get<T = unknown>(key: string): Promise<T | undefined>
-	put(key: string, value: unknown): Promise<void>
+	put(key: string, value: unknown, options?: { onlyIf?: { equals?: unknown } }): Promise<void>
 	delete(key: string): Promise<boolean>
 	list<T = unknown>(options?: { prefix?: string }): Promise<Map<string, T>>
 }

@@ -2,7 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/@flowcraft/cloudflare-adapter.svg)](https://www.npmjs.com/package/@flowcraft/cloudflare-adapter)
 
-This adapter provides a serverless-friendly solution for running distributed workflows on Cloudflare's edge network. It uses **Cloudflare Queues** for reliable job distribution, **Durable Objects** for state persistence, and **Cloudflare KV** for coordination.
+This adapter provides a serverless-friendly solution for running distributed workflows on Cloudflare's edge network. It uses **Cloudflare Queues** for reliable job distribution, **Durable Objects** for state persistence and atomic coordination, and **Cloudflare KV** for status tracking.
 
 ## Installation
 
@@ -24,39 +24,39 @@ graph TD
 
     subgraph "Cloudflare"
         Queue[("Cloudflare Queue")]
-        DO[("Durable Object<br>Context Store")]
-        KV[("KV Namespace<br>Coordination")]
+        DO[("Durable Object<br>Context & Coordination")]
         StatusKV[("KV Namespace<br>Status")]
     end
 
-    Worker -- "Polls for Jobs" --> Queue
+    Worker -- "Receives Jobs (Push)" --> Queue
     Worker -- "Reads/Writes State" --> DO
-    Worker -- "Manages Locks/Counters" --> KV
+    Worker -- "Manages Atomic Locks/Counters" --> DO
     Worker -- "Tracks Status" --> StatusKV
 ```
+
+> **Important:** Cloudflare Queues work via **push** (Workers queue handler), not polling. The adapter exposes `handleJob()` for use in your queue handler.
 
 ## Infrastructure Setup
 
 You must have the following Cloudflare resources provisioned:
 
 -   A **Cloudflare Queue** to handle jobs.
--   Two **KV Namespaces**:
-    1.  For workflow **coordination** (locks, fan-in counters).
-    2.  For workflow **status** tracking.
--   A **Durable Object** class for context persistence.
+-   A **KV Namespace** for workflow **status** tracking.
+-   A **Durable Object** class for:
+    -   Context persistence (workflow state survives restarts)
+    -   Atomic coordination (fan-in join counters, locks)
 
 ### Using Wrangler CLI
 
 ```bash
-# 1. Create KV namespaces
-wrangler kv:namespace create "flowcraft-coordination"
+# 1. Create a KV namespace for status
 wrangler kv:namespace create "flowcraft-status"
 
 # 2. Create a queue
 wrangler queues create "flowcraft-jobs"
 
-# 3. Create Durable Object
-wrangler d1 create flowcraft-contexts  # Optional: for SQL-based context if needed
+# 3. Define a Durable Object class in your Worker (for context & coordination)
+# See "Durable Object Setup" section below
 ```
 
 ### Using Terraform
@@ -64,10 +64,6 @@ wrangler d1 create flowcraft-contexts  # Optional: for SQL-based context if need
 ```hcl
 resource "cloudflare_queue" "jobs" {
   name = "flowcraft-jobs"
-}
-
-resource "cloudflare_workers_kv_namespace" "coordination" {
-  title = "flowcraft-coordination"
 }
 
 resource "cloudflare_workers_kv_namespace" "status" {
@@ -92,10 +88,6 @@ main = "src/index.ts"
 compatibility_date = "2024-01-01"
 
 [[kv_namespaces]]
-binding = "COORDINATION"
-id = "your-coordination-namespace-id"
-
-[[kv_namespaces]]
 binding = "STATUS"
 id = "your-status-namespace-id"
 
@@ -108,11 +100,10 @@ consumer_type = "http-pull"
 ### 2. Create the Worker
 
 ```typescript
-import { CloudflareQueueAdapter, KVCoordinationStore, DurableObjectContext } from '@flowcraft/cloudflare-adapter'
+import { CloudflareQueueAdapter, DurableObjectCoordinationStore } from '@flowcraft/cloudflare-adapter'
 import type { Queue } from '@cloudflare/workers-types'
 
 export interface Env {
-	COORDINATION: KVNamespace
 	STATUS: KVNamespace
 	JOBS: Queue
 }
@@ -122,9 +113,13 @@ const registry = { /* your node implementations */ }
 
 export default {
 	async queue(batch: MessageBatch, env: Env): Promise<void> {
-		// Initialize the coordination store
-		const coordinationStore = new KVCoordinationStore({
-			namespace: env.COORDINATION,
+		// Note: In a real Worker, you'd get the Durable Object stub from env
+		// For example: const doStorage = env.FLOWCRAFT_CONTEXT_DO.get(env.FLOWCRAFT_CONTEXT_DO.idFromName('default'))
+		const mockStorage = { /* your Durable Object storage */ }
+
+		// Use DurableObjectCoordinationStore for atomic fan-in joins
+		const coordinationStore = new DurableObjectCoordinationStore({
+			namespace: mockStorage,
 		})
 
 		// Create the adapter (one per worker instance)
@@ -136,12 +131,11 @@ export default {
 			coordinationStore,
 			queue: env.JOBS,
 			durableObjectStorage: env.durableObjectStorage,
-			kvNamespace: env.COORDINATION,
 			statusKVNamespace: env.STATUS,
 			queueName: 'flowcraft-jobs',
 		})
 
-		// Process each message
+		// Process each message using handleJob()
 		for (const message of batch.messages) {
 			try {
 				const job = message.body as { runId: string; blueprintId: string; nodeId: string }
@@ -196,7 +190,6 @@ A client starts a workflow by initializing the context and sending the first job
 import { analyzeBlueprint } from 'flowcraft'
 
 interface Env {
-	COORDINATION: KVNamespace
 	STATUS: KVNamespace
 	JOBS: Queue
 }
@@ -274,7 +267,7 @@ CLOUDFLARE_API_TOKEN=your-token CLOUDFLARE_ACCOUNT_ID=your-account pnpm test:int
 
 -   **`CloudflareQueueAdapter`**: The main class that orchestrates job execution.
 -   **`DurableObjectContext`**: An `IAsyncContext` implementation for storing state in Durable Objects.
--   **`KVCoordinationStore`**: An `ICoordinationStore` implementation using Cloudflare KV for distributed locking and fan-in counting.
+-   **`DurableObjectCoordinationStore`**: An `ICoordinationStore` implementation using Durable Objects for atomic distributed locking and fan-in counting.
 
 ## Webhook Endpoints
 
@@ -285,7 +278,7 @@ The Cloudflare adapter does not currently support webhook endpoint registration.
 | Feature | Cloudflare Adapter | Other Adapters |
 |---------|-------------------|----------------|
 | State Storage | Durable Objects | DynamoDB, Cosmos DB, Firestore |
-| Coordination | KV | Redis, DynamoDB |
+| Coordination | Durable Objects | Redis, DynamoDB |
 | Job Queue | Cloudflare Queues | SQS, Pub/Sub, RabbitMQ |
 | Testing | Miniflare | Testcontainers |
 
