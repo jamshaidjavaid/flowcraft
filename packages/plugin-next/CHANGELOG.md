@@ -1,5 +1,12 @@
 # @flowcraft/next-plugin
 
+## 1.0.0-alpha.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @flowcraft/compiler@1.0.0-alpha.2
+
 ## 1.0.0-alpha.1
 
 ### Patch Changes

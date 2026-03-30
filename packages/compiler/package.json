@@ -1,7 +1,7 @@
 {
 	"name": "@flowcraft/compiler",
 	"type": "module",
-	"version": "1.0.0-alpha.1",
+	"version": "1.0.0-alpha.2",
 	"description": "A compiler for transforming imperative TypeScript into declarative Flowcraft workflows",
 	"license": "MIT",
 	"homepage": "https://flowcraft.js.org",

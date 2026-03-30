@@ -1,5 +1,12 @@
 # @flowcraft/nuxt-module
 
+## 1.0.0-alpha-2
+
+### Patch Changes
+
+- @flowcraft/vite-plugin@1.0.0-alpha.2
+- @flowcraft/common@1.0.0-alpha.2
+
 ## 1.0.0-alpha.1
 
 ### Patch Changes
