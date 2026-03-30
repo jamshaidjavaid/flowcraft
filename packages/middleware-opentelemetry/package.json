@@ -23,10 +23,10 @@
 		"@opentelemetry/api": "^1.8.0"
 	},
 	"devDependencies": {
-		"@opentelemetry/sdk-trace-base": "^2.5.1",
-		"@types/node": "^25.3.3",
+		"@opentelemetry/sdk-trace-base": "^2.6.1",
+		"@types/node": "^25.5.0",
 		"tsdown": "^0.21.7",
-		"typescript": "^5.9.3",
-		"vitest": "^4.0.18"
+		"typescript": "^6.0.2",
+		"vitest": "^4.1.2"
 	}
 }

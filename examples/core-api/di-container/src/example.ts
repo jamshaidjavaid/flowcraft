@@ -6,7 +6,7 @@ async function validateUser({ context }: any) {
 	const user = await context.get('user')
 	console.log('Validating user:', user)
 	// Simulate validation logic
-	if (!user || !user.name) {
+	if (!user?.name) {
 		throw new Error('Invalid user data')
 	}
 	await context.set('validated_user', user)

@@ -232,7 +232,7 @@ async function validateData(ctx: NodeContext<WorkflowContext>) {
 	console.log('✅ [Subflow 1] Validating input data...')
 	const data = await context.get('inputData')
 
-	if (!data || !data.name) {
+	if (!data?.name) {
 		throw new Error('Invalid input: missing name')
 	}
 

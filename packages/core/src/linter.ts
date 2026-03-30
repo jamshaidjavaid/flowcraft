@@ -61,7 +61,7 @@ export function lintBlueprint(
 			}
 		}
 		if (node.uses === 'subflow' && node.params?.blueprintId) {
-			if (!blueprints || !blueprints[node.params.blueprintId]) {
+			if (!blueprints?.[node.params.blueprintId]) {
 				issues.push({
 					code: 'INVALID_SUBFLOW_BLUEPRINT_ID',
 					message: `Subflow node '${node.id}' references blueprintId '${node.params.blueprintId}' which is not found in the blueprints registry.`,

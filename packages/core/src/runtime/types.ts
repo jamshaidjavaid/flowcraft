@@ -40,7 +40,7 @@ export interface IOrchestrator {
 	run(context: ExecutionContext<any, any>, traverser: GraphTraverser): Promise<WorkflowResult<any>>
 }
 
-export type { NodeExecutor, NodeExecutionResult }
+export type { NodeExecutionResult, NodeExecutor }
 
 export interface IRuntime<
 	TContext extends Record<string, any> = Record<string, any>,

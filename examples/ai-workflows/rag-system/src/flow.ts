@@ -40,7 +40,7 @@ async function generateSingleEmbedding(
 	ctx: NodeContext<RagContext, any, DocumentChunk>,
 ): Promise<NodeResult<{ chunk: DocumentChunk; vector: number[] }>> {
 	const chunk = ctx.input
-	if (!chunk || !chunk.text) {
+	if (!chunk?.text) {
 		throw new TypeError('Batch worker for embeddings received an invalid chunk.')
 	}
 	const vector = await getEmbedding(chunk.text)

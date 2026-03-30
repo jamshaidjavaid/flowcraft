@@ -15,7 +15,7 @@ async function validateUser(ctx: NodeContext<WorkflowContext>) {
 
 	// Get user data from context
 	const user = await context.get('user')
-	if (!user || !user.name) {
+	if (!user?.name) {
 		throw new Error('Invalid user: missing name')
 	}
 

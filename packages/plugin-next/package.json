@@ -37,7 +37,7 @@
 		"@flowcraft/compiler": "1.0.0-alpha.0"
 	},
 	"devDependencies": {
-		"@types/node": "^25.3.3",
+		"@types/node": "^25.5.0",
 		"tsdown": "^0.21.7"
 	},
 	"peerDependencies": {

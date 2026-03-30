@@ -31,7 +31,7 @@ export interface BlueprintAnalysis {
  */
 export function checkForCycles(blueprint: WorkflowBlueprint): Cycles {
 	const cycles: Cycles = []
-	if (!blueprint || !blueprint.nodes || blueprint.nodes.length === 0) {
+	if (!blueprint?.nodes || blueprint.nodes.length === 0) {
 		return cycles
 	}
 
@@ -101,7 +101,7 @@ export function checkForCycles(blueprint: WorkflowBlueprint): Cycles {
  * @returns Mermaid syntax string for the flowchart
  */
 export function generateMermaid(blueprint: WorkflowBlueprint): string {
-	if (!blueprint || !blueprint.nodes || blueprint.nodes.length === 0) {
+	if (!blueprint?.nodes || blueprint.nodes.length === 0) {
 		return 'flowchart TD\n    empty[Empty Blueprint]'
 	}
 
@@ -144,7 +144,7 @@ export function generateMermaid(blueprint: WorkflowBlueprint): string {
  * @returns Mermaid syntax string for the flowchart with execution path highlighting
  */
 export function generateMermaidForRun(blueprint: WorkflowBlueprint, events: FlowcraftEvent[]): string {
-	if (!blueprint || !blueprint.nodes || blueprint.nodes.length === 0) {
+	if (!blueprint?.nodes || blueprint.nodes.length === 0) {
 		return 'flowchart TD\n    empty[Empty Blueprint]'
 	}
 
@@ -228,7 +228,7 @@ export function generateMermaidForRun(blueprint: WorkflowBlueprint, events: Flow
  * @returns Analysis result with cycles, start nodes, terminal nodes, and other metrics
  */
 export function analyzeBlueprint(blueprint: WorkflowBlueprint): BlueprintAnalysis {
-	if (!blueprint || !blueprint.nodes || blueprint.nodes.length === 0) {
+	if (!blueprint?.nodes || blueprint.nodes.length === 0) {
 		return {
 			cycles: [],
 			startNodeIds: [],

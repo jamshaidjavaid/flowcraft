@@ -120,7 +120,7 @@ describe('Integration Tests - End-to-End Workflow Scenarios', () => {
 			// Validate user data
 			flow.node('validate-user-data', async ({ context }) => {
 				const user = await context.get('user')
-				if (!user.email || !user.email.includes('@')) {
+				if (!user.email?.includes('@')) {
 					throw new Error('Invalid email')
 				}
 				if (!user.password || user.password.length < 8) {
