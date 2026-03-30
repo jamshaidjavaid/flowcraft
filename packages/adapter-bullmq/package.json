@@ -5,15 +5,15 @@
 	"homepage": "https://flowcraft.js.org",
 	"exports": {
 		".": {
-			"types": "./dist/index.d.ts",
-			"import": "./dist/index.js"
+			"types": "./dist/index.d.mts",
+			"import": "./dist/index.mjs"
 		}
 	},
 	"files": [
 		"dist"
 	],
 	"scripts": {
-		"build": "tsup src/index.ts --format esm --dts",
+		"build": "tsdown src/index.ts --format esm --dts",
 		"test": "./testcontainers.sh && vitest run src/*.test.ts",
 		"typecheck": "tsc --noEmit"
 	},
@@ -24,7 +24,7 @@
 	},
 	"devDependencies": {
 		"@testcontainers/redis": "^11.12.0",
-		"tsup": "^8.5.1",
+		"tsdown": "^0.21.7",
 		"typescript": "^5.9.3",
 		"vitest": "^4.0.18"
 	}

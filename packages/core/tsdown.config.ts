@@ -1,8 +1,7 @@
-import { defineConfig } from 'tsup'
+import { defineConfig } from 'tsdown'
 
 export default defineConfig({
-	entry: ['src/**/*.ts'],
-	entryPoints: ['src/index.ts', 'src/testing/index.ts'],
+	entry: ['src/index.ts', 'src/sdk.ts', 'src/testing/index.ts'],
 	format: ['esm'],
 	target: 'esnext',
 	dts: true,

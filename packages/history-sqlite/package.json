@@ -5,16 +5,16 @@
 	"description": "SQLite-based event store for Flowcraft workflow observability",
 	"exports": {
 		".": {
-			"types": "./dist/index.d.ts",
-			"import": "./dist/index.js"
+			"types": "./dist/index.d.mts",
+			"import": "./dist/index.mjs"
 		}
 	},
 	"files": [
 		"dist"
 	],
 	"scripts": {
-		"build": "tsup",
-		"dev": "tsup --watch",
+		"build": "tsdown",
+		"dev": "tsdown --watch",
 		"typecheck": "tsc --noEmit",
 		"test": "vitest run"
 	},
@@ -24,7 +24,7 @@
 	},
 	"devDependencies": {
 		"@types/better-sqlite3": "^7.6.13",
-		"tsup": "^8.5.1",
+		"tsdown": "^0.21.7",
 		"typescript": "^5.9.3",
 		"vitest": "^4.0.18"
 	}

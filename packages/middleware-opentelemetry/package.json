@@ -6,15 +6,15 @@
 	"homepage": "https://flowcraft.js.org",
 	"exports": {
 		".": {
-			"types": "./dist/index.d.ts",
-			"import": "./dist/index.js"
+			"types": "./dist/index.d.mts",
+			"import": "./dist/index.mjs"
 		}
 	},
 	"files": [
 		"dist"
 	],
 	"scripts": {
-		"build": "tsup src/index.ts --format esm --dts",
+		"build": "tsdown src/index.ts --format esm --dts",
 		"test": "vitest run",
 		"typecheck": "tsc --noEmit"
 	},
@@ -25,7 +25,7 @@
 	"devDependencies": {
 		"@opentelemetry/sdk-trace-base": "^2.5.1",
 		"@types/node": "^25.3.3",
-		"tsup": "^8.5.1",
+		"tsdown": "^0.21.7",
 		"typescript": "^5.9.3",
 		"vitest": "^4.0.18"
 	}

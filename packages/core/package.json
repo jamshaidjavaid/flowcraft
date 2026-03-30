@@ -27,24 +27,24 @@
 	],
 	"exports": {
 		".": {
-			"types": "./dist/index.d.ts",
-			"import": "./dist/index.js"
+			"types": "./dist/index.d.mts",
+			"import": "./dist/index.mjs"
 		},
 		"./sdk": {
-			"types": "./dist/sdk.d.ts",
-			"import": "./dist/sdk.js"
+			"types": "./dist/sdk.d.mts",
+			"import": "./dist/sdk.mjs"
 		},
 		"./testing": {
-			"types": "./dist/testing/index.d.ts",
-			"import": "./dist/testing/index.js"
+			"types": "./dist/testing/index.d.mts",
+			"import": "./dist/testing/index.mjs"
 		}
 	},
 	"files": [
 		"dist"
 	],
 	"scripts": {
-		"dev": "tsup --watch",
-		"build": "tsup",
+		"dev": "tsdown --watch",
+		"build": "tsdown",
 		"typecheck": "tsc --noEmit",
 		"test": "vitest run",
 		"test:watch": "vitest",
@@ -53,7 +53,7 @@
 	"devDependencies": {
 		"@types/node": "^25.3.3",
 		"@vitest/coverage-v8": "4.0.4",
-		"tsup": "^8.5.1",
+		"tsdown": "^0.21.7",
 		"typescript": "^5.9.3",
 		"vitest": "^4.0.18"
 	}

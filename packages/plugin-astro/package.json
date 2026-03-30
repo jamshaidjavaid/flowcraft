@@ -19,16 +19,16 @@
 	],
 	"exports": {
 		".": {
-			"types": "./dist/index.d.ts",
-			"import": "./dist/index.js"
+			"types": "./dist/index.d.mts",
+			"import": "./dist/index.mjs"
 		}
 	},
 	"files": [
 		"dist"
 	],
 	"scripts": {
-		"dev": "tsup --watch",
-		"build": "tsup",
+		"dev": "tsdown --watch",
+		"build": "tsdown",
 		"typecheck": "tsc --noEmit",
 		"test": "echo \"Error: no test specified\" && exit 0"
 	},
@@ -38,7 +38,7 @@
 	"devDependencies": {
 		"@types/node": "^25.3.3",
 		"astro": "^5.18.0",
-		"tsup": "^8.5.1"
+		"tsdown": "^0.21.7"
 	},
 	"peerDependencies": {
 		"astro": "^3.0.0 || ^4.0.0"
