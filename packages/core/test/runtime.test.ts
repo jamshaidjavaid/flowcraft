@@ -449,6 +449,55 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 			expect(result.context['_outputs.B']).toBe(20)
 		})
 
+		it('should apply edge transform to the inputs-referenced node output, not the edge source', async () => {
+			const flow = createFlow('transform-explicit-inputs')
+			flow
+				.node('start', async () => ({ output: { deeply: { nested: { value: 'extracted' } } } }))
+				.node('middle', async () => ({ output: 'pass-through' }))
+				.node('end', async (ctx) => ({ output: ctx.input }), { inputs: 'start' })
+				.edge('start', 'middle')
+				.edge('middle', 'end', { transform: 'input.deeply.nested.value' })
+
+			const runtime = new FlowRuntime({})
+			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
+
+			// The transform should be evaluated against start's output (via inputs: 'start'),
+			// not middle's output. end should receive 'extracted', not the full object.
+			expect(result.context['_outputs.end']).toBe('extracted')
+		})
+
+		it('should still respect edge transform with PropertyEvaluator on direct edges', async () => {
+			const flow = createFlow('transform-direct-edge')
+			flow
+				.node('start', async () => ({ output: { deeply: { nested: { value: 'extracted' } } } }))
+				.node('end', async (ctx) => ({ output: ctx.input }))
+				.edge('start', 'end', { transform: 'input.deeply.nested.value' })
+
+			const runtime = new FlowRuntime({})
+			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
+
+			expect(result.context['_outputs.end']).toBe('extracted')
+		})
+
+		it('should store transformed value in _inputs when edge has transform and target has explicit inputs', async () => {
+			const flow = createFlow('transform-stores-inputs')
+			flow
+				.node('A', async () => ({ output: { data: 42 } }))
+				.node('B', async () => ({ output: 'B-result' }))
+				.node('C', async (ctx) => ({ output: ctx.input }), { inputs: 'A' })
+				.edge('A', 'B')
+				.edge('B', 'C', { transform: 'input.data' })
+
+			const runtime = new FlowRuntime({})
+			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
+
+			// When inputs: 'A' references the same node as the edge source (A->B->C with inputs: 'A'),
+			// the transform should evaluate against A's output and the result should be used.
+			// But here inputs: 'A' while edge source is 'B'. The fix should resolve A's output from
+			// context and evaluate the transform against it.
+			expect(result.context['_outputs.C']).toBe(42)
+		})
+
 		it('should handle "undefined" as a valid node output and save it to the context', async () => {
 			const flow = createFlow('undefined').node('A', async () => ({
 				output: undefined,

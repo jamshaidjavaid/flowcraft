@@ -129,12 +129,23 @@ export class WorkflowLogicHandler {
 			return
 		}
 
+		let sourceOutput = sourceResult.output
+
+		// When the target node has an explicit `inputs` map, resolve that node's output
+		if (hasEdgeTransform && hasExplicitInputs && typeof targetNode.inputs === 'string') {
+			const inputsKey = targetNode.inputs
+			const resolvedKey = inputsKey.startsWith('_') ? inputsKey : `_outputs.${inputsKey}`
+			if ((await asyncContext.has(resolvedKey as any)) && inputsKey !== edge.source) {
+				sourceOutput = await asyncContext.get(resolvedKey as any)
+			}
+		}
+
 		const finalInput = edge.transform
 			? this.evaluator.evaluate(edge.transform, {
-					input: sourceResult.output,
+					input: sourceOutput,
 					context: await asyncContext.toJSON(),
 				})
-			: sourceResult.output
+			: sourceOutput
 		const inputKey = `_inputs.${targetNode.id}`
 		await asyncContext.set(inputKey as any, finalInput)
 		await this.eventBus.emit({
@@ -147,7 +158,7 @@ export class WorkflowLogicHandler {
 				executionId: executionId || 'unknown',
 			},
 		})
-		if (!hasExplicitInputs) {
+		if (!hasExplicitInputs || hasEdgeTransform) {
 			targetNode.inputs = inputKey
 		}
 	}
