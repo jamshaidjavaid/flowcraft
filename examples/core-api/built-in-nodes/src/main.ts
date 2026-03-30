@@ -6,6 +6,7 @@ import {
 	createSubflowWorkflow,
 	createValidationSubflow,
 	createWaitWorkflow,
+	type WorkflowContext,
 } from './workflow.js'
 
 async function main() {
@@ -19,7 +20,7 @@ async function main() {
 	const enrichmentBlueprint = enrichmentFlow.toBlueprint()
 	const enrichmentRegistry = enrichmentFlow.getFunctionRegistry()
 
-	const runtime = new FlowRuntime({
+	const runtime = new FlowRuntime<WorkflowContext, Record<string, any>>({
 		evaluator: new UnsafeEvaluator(),
 		blueprints: {
 			[validationBlueprint.id]: validationBlueprint,
@@ -107,7 +108,7 @@ async function main() {
 			console.log(`   Duration: ${waitResults.durationMs}ms`)
 		} else {
 			console.log('   Wait results not found in context')
-			console.log('   _outputs.processAfterWait:', waitResult.context._outputs?.processAfterWait)
+			console.log('   _outputs.processAfterWait:', (waitResult.context as any)._outputs?.processAfterWait)
 		}
 
 		console.log('✅ Wait processing completed successfully\n')
@@ -157,7 +158,7 @@ async function main() {
 			console.log(`   Processing completed: ${finalResult.completedAt}`)
 		} else {
 			console.log('   Final result not found in context')
-			console.log('   _outputs.processResults:', subflowResult.context._outputs?.processResults)
+			console.log('   _outputs.processResults:', (subflowResult.context as any)._outputs?.processResults)
 		}
 
 		console.log('✅ Subflow processing completed successfully\n')

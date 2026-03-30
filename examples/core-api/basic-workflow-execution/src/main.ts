@@ -1,5 +1,5 @@
 import { ConsoleLogger, FlowRuntime } from 'flowcraft'
-import { createUserProcessingWorkflow } from './workflow'
+import { createUserProcessingWorkflow, type WorkflowContext } from './workflow'
 
 async function main() {
 	console.log('🚀 Flowcraft Basic Workflow Execution Example\n')
@@ -15,7 +15,7 @@ async function main() {
 	console.log()
 
 	// Create a runtime with console logging
-	const runtime = new FlowRuntime({
+	const runtime = new FlowRuntime<WorkflowContext, Record<string, any>>({
 		logger: new ConsoleLogger(),
 	})
 
@@ -39,7 +39,7 @@ async function main() {
 		console.log('\n✅ Workflow completed successfully!')
 		console.log('\n📊 Execution Results:')
 		console.log(`   Status: ${result.status}`)
-		console.log(`   Execution ID: ${result.context._executionId}`)
+		console.log(`   Execution ID: ${(result.context as any)._executionId}`)
 
 		console.log('\n📋 Final Context:')
 		// Filter out internal Flowcraft keys for cleaner output

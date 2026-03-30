@@ -1,6 +1,6 @@
 import { createFlow, type NodeContext } from 'flowcraft'
 
-interface WorkflowContext {
+export interface WorkflowContext {
 	user: { name: string; email: string }
 	processedUser: { name: string; email: string; processedAt: string; status: string }
 }

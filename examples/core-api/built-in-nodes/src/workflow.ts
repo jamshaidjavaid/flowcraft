@@ -1,9 +1,9 @@
 import { createFlow, type NodeContext } from 'flowcraft'
 
-interface WorkflowContext {
+export interface WorkflowContext {
 	batchItems: { id: number; name: string; value: number }[]
 	batchResults: { id: number; name: string; value: number; processed: boolean }[]
-	loopData: { items: number[]; currentIndex: number; counter: number; results: number[]; maxIterations: number }
+	loopData: { items: number[]; currentIndex: number; counter: number; results: string[]; maxIterations: number }
 	loopResults: number[]
 	waitCompleted: boolean
 	mainData: { message: string; timestamp: string }
@@ -13,6 +13,24 @@ interface WorkflowContext {
 	validationResults: any
 	inputData: any
 	finalResult: any
+	batchStats: {
+		totalItems: number
+		highValueItems: number
+		totalValue: number
+		premiumItems: number
+		processingTime: string
+	}
+	processedItems: {
+		processed: boolean
+		processedAt: string
+		status: string
+		metadata: { processor: string; quality: string }
+		id: number
+		name: string
+		value: number
+	}[]
+	loopSummary: { totalIterations: number; duration: string; allResults: string[] }
+	waitResults: { startTime: string; endTime: string; durationMs: number }
 }
 
 // ============================================================================

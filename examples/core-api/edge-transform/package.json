@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"start": "tsx src/main.ts",
-		"typecheck": "npx tsgo --noEmit"
+		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
 		"flowcraft": "workspace:*"
