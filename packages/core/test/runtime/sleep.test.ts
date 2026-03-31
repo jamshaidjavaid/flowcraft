@@ -1,6 +1,68 @@
 import { describe, expect, it } from 'vitest'
 import { createFlow, FlowRuntime } from '../../src'
 
+describe('SleepNode duration formats', () => {
+	it('should accept minutes duration string', async () => {
+		const flow = createFlow('sleep-minutes')
+			.node('start', async () => ({ output: 'start' }))
+			.sleep('pause', { duration: '1m' })
+
+		const runtime = new FlowRuntime()
+		const result = await flow.run(runtime)
+		expect(result.status).toBe('awaiting')
+	})
+
+	it('should accept hours duration string', async () => {
+		const flow = createFlow('sleep-hours')
+			.node('start', async () => ({ output: 'start' }))
+			.sleep('pause', { duration: '1h' })
+
+		const runtime = new FlowRuntime()
+		const result = await flow.run(runtime)
+		expect(result.status).toBe('awaiting')
+	})
+
+	it('should accept days duration string', async () => {
+		const flow = createFlow('sleep-days')
+			.node('start', async () => ({ output: 'start' }))
+			.sleep('pause', { duration: '1d' })
+
+		const runtime = new FlowRuntime()
+		const result = await flow.run(runtime)
+		expect(result.status).toBe('awaiting')
+	})
+
+	it('should reject invalid duration string', async () => {
+		const flow = createFlow('sleep-invalid')
+			.node('start', async () => ({ output: 'start' }))
+			.sleep('pause', { duration: 'invalid' })
+
+		const runtime = new FlowRuntime()
+		const result = await flow.run(runtime)
+		expect(result.status).toBe('failed')
+	})
+
+	it('should reject invalid duration type', async () => {
+		const flow = createFlow('sleep-invalid-type')
+			.node('start', async () => ({ output: 'start' }))
+			.sleep('pause', { duration: null as any })
+
+		const runtime = new FlowRuntime()
+		const result = await flow.run(runtime)
+		expect(result.status).toBe('failed')
+	})
+
+	it('should accept zero duration', async () => {
+		const flow = createFlow('sleep-zero')
+			.node('start', async () => ({ output: 'start' }))
+			.sleep('pause', { duration: 0 })
+
+		const runtime = new FlowRuntime()
+		const result = await flow.run(runtime)
+		expect(result.status).toBe('awaiting')
+	})
+})
+
 describe('SleepNode output passthrough', () => {
 	it('should pass through the output from the previous node', async () => {
 		const flow = createFlow('sleep-passthrough-test')
@@ -40,24 +102,19 @@ describe('SleepNode output passthrough', () => {
 
 		const blueprint = flow.toBlueprint()
 
-		// Register blueprint so the scheduler can find it when resuming
 		const runtime = new FlowRuntime({
 			blueprints: { [blueprint.id]: blueprint },
 		})
 
-		// Start scheduler with fast check interval for testing
 		runtime.startScheduler(50)
 
 		const result = await flow.run(runtime)
 		expect(result.status).toBe('awaiting')
 
-		// The scheduler will detect the expired timer and call resume automatically
 		await new Promise((resolve) => setTimeout(resolve, 200))
 
-		// Workflow should have been resumed and removed from active tracking
 		expect(runtime.scheduler.getActiveWorkflows().length).toBe(0)
 
-		// Retrieve the result from the scheduler's auto-resume
 		const executionId = result.context._executionId as string
 		const resumed = runtime.scheduler.getResumeResult(executionId)
 		expect(resumed).toBeDefined()
