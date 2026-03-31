@@ -98,7 +98,7 @@ The `FlowRuntime` can be configured with pluggable components to tailor its beha
 
 ## Distributed Execution
 
-Flowcraft's architecture is designed for progressive scalability. The `BaseDistributedAdapter` provides a foundation for running workflows across multiple machines. Flowcraft provides official adapters for [BullMQ](https://www.npmjs.com/package/@flowcraft/bullmq-adapter), [AWS](https://www.npmjs.com/package/@flowcraft/sqs-adapter), [GCP](https://www.npmjs.com/package/@flowcraft/gcp-adapter), [Azure](https://www.npmjs.com/package/@flowcraft/azure-adapter), [RabbitMQ](https://www.npmjs.com/package/@flowcraft/rabbitmq-adapter), [Kafka](https://www.npmjs.com/package/@flowcraft/kafka-adapter), and [Cloudflare](https://www.npmjs.com/package/@flowcraft/cloudflare-adapter).
+Flowcraft's architecture is designed for progressive scalability. The `BaseDistributedAdapter` provides a foundation for running workflows across multiple machines. Flowcraft provides official adapters for [BullMQ](https://www.npmjs.com/package/@flowcraft/bullmq-adapter), [AWS](https://www.npmjs.com/package/@flowcraft/sqs-adapter), [GCP](https://www.npmjs.com/package/@flowcraft/gcp-adapter), [Azure](https://www.npmjs.com/package/@flowcraft/azure-adapter), [RabbitMQ](https://www.npmjs.com/package/@flowcraft/rabbitmq-adapter), [Kafka](https://www.npmjs.com/package/@flowcraft/kafka-adapter), [Vercel](https://www.npmjs.com/package/@flowcraft/vercel-adapter), and [Cloudflare](https://www.npmjs.com/package/@flowcraft/cloudflare-adapter).
 
 ## Documentation
 

@@ -1,0 +1,32 @@
+{
+	"name": "@flowcraft/vercel-adapter",
+	"version": "1.0.0",
+	"homepage": "https://flowcraft.js.org",
+	"files": [
+		"dist"
+	],
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.mts",
+			"import": "./dist/index.mjs"
+		}
+	},
+	"scripts": {
+		"build": "tsdown src/index.ts --format esm --dts",
+		"test": "./testcontainers.sh && vitest run src/*.test.ts",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@vercel/queue": "^0.1.4",
+		"flowcraft": "^2.8.1",
+		"ioredis": "^5.10.1"
+	},
+	"devDependencies": {
+		"@testcontainers/redis": "^11.13.0",
+		"testcontainers": "^11.13.0",
+		"tsdown": "^0.21.7",
+		"typescript": "^6.0.2",
+		"vitest": "^4.1.2"
+	}
+}

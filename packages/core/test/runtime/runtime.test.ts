@@ -71,13 +71,10 @@ describe('FlowRuntime - Resume', () => {
 	})
 
 	it('should throw when resuming with invalid node ID', async () => {
-		const flow = createFlow('resume-invalid-node').node(
-			'a',
-			async ({ context, dependencies }) => {
-				await dependencies.workflowState.markAsAwaiting('a')
-				return { output: 'waiting' }
-			},
-		)
+		const flow = createFlow('resume-invalid-node').node('a', async ({ dependencies }) => {
+			await dependencies.workflowState.markAsAwaiting('a')
+			return { output: 'waiting' }
+		})
 
 		const blueprint = flow.toBlueprint()
 		const runtime = new FlowRuntime()

@@ -722,6 +722,34 @@ importers:
         specifier: ^4.1.2
         version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(vite@8.0.3(@emnapi/core@1.6.0)(@emnapi/runtime@1.9.1)(@types/node@25.5.0)(esbuild@0.27.4)(jiti@2.6.1)(terser@5.44.0)(tsx@4.21.0)(yaml@2.8.3))
 
+  packages/adapter-vercel:
+    dependencies:
+      '@vercel/queue':
+        specifier: ^0.1.4
+        version: 0.1.4
+      flowcraft:
+        specifier: ^2.8.1
+        version: 2.9.2
+      ioredis:
+        specifier: ^5.10.1
+        version: 5.10.1
+    devDependencies:
+      '@testcontainers/redis':
+        specifier: ^11.13.0
+        version: 11.13.0
+      testcontainers:
+        specifier: ^11.13.0
+        version: 11.13.0
+      tsdown:
+        specifier: ^0.21.7
+        version: 0.21.7(@emnapi/core@1.6.0)(@emnapi/runtime@1.9.1)(synckit@0.11.12)(typescript@6.0.2)
+      typescript:
+        specifier: ^6.0.2
+        version: 6.0.2
+      vitest:
+        specifier: ^4.1.2
+        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(vite@8.0.3(@emnapi/core@1.6.0)(@emnapi/runtime@1.9.1)(@types/node@25.5.0)(esbuild@0.27.4)(jiti@2.6.1)(terser@5.44.0)(tsx@4.21.0)(yaml@2.8.3))
+
   packages/cli:
     dependencies:
       '@flowcraft/postgres-history':
@@ -4814,6 +4842,14 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
+  '@vercel/oidc@3.2.0':
+    resolution: {integrity: sha512-UycprH3T6n3jH0k44NHMa7pnFHGu/N05MjojYr+Mc6I7obkoLIJujSWwin1pCvdy/eOxrI/l3uDLQsmcrOb4ug==}
+    engines: {node: '>= 20'}
+
+  '@vercel/queue@0.1.4':
+    resolution: {integrity: sha512-wo+jCycmCX078vQSbkX+RcLvySONDCK0f9aQp5UMKQD1+B+xKt3YVbIYbZukvoHQpbm5nnk6If+ADSeK/PmCgQ==}
+    engines: {node: '>=20.0.0'}
+
   '@vitejs/plugin-vue-jsx@5.1.1':
     resolution: {integrity: sha512-uQkfxzlF8SGHJJVH966lFTdjM/lGcwJGzwAHpVqAPDD/QcsqoUGa+q31ox1BrUfi+FLP2ChVp7uLXE3DkHyDdQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
@@ -7535,6 +7571,10 @@ packages:
 
   mitt@3.0.1:
     resolution: {integrity: sha512-vKivATfr97l2/QBCYAkXYDbrIWPM2IIKEl7YPhjCvKlG3kE2gm+uBo6nEXK3M5/Ffh/FLpKExzOQ3JJoJGFKBw==}
+
+  mixpart@0.0.5:
+    resolution: {integrity: sha512-TpWi9/2UIr7VWCVAM7NB4WR4yOglAetBkuKfxs3K0vFcUukqAaW1xsgX0v1gNGiDKzYhPHFcHgarC7jmnaOy4w==}
+    engines: {node: '>=20.0.0'}
 
   mkdirp-classic@0.5.3:
     resolution: {integrity: sha512-gKLcREMhtuZRwRAfqP3RFW+TK4JqApVBtOIftVgjuABpAtpxhPGaDcfvbhNvD0B8iD1oUr/txX35NjcaY6Ns/A==}
@@ -14061,6 +14101,15 @@ snapshots:
       - rollup
       - supports-color
 
+  '@vercel/oidc@3.2.0': {}
+
+  '@vercel/queue@0.1.4':
+    dependencies:
+      '@vercel/oidc': 3.2.0
+      minimatch: 10.2.4
+      mixpart: 0.0.5
+      picocolors: 1.1.1
+
   '@vitejs/plugin-vue-jsx@5.1.1(vite@7.3.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.32.0)(terser@5.44.0)(tsx@4.21.0)(yaml@2.8.3))(vue@3.5.31(typescript@6.0.2))':
     dependencies:
       '@babel/core': 7.28.5
@@ -17408,6 +17457,8 @@ snapshots:
       minipass: 7.1.2
 
   mitt@3.0.1: {}
+
+  mixpart@0.0.5: {}
 
   mkdirp-classic@0.5.3: {}
 
