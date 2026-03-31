@@ -49,7 +49,7 @@ Automate routine business tasks like approvals and notifications.
 
 Run workflows across multiple machines or services.
 
-- **Example**: Distributed Workflow (see [Distributed Example](https://github.com/gorango/flowcraft/tree/master/examples/adapters/distributed-execution))
+- **Example**: Distributed Workflow (see [Distributed Example](https://github.com/gorango/flowcraft/tree/master/examples/ai-workflows/distributed-execution))
 - **Features**: Adapters for queues, persistence.
 
 Choose the right pattern for your needs!
