@@ -90,7 +90,7 @@ export const inspectCommand = new Command('inspect')
 			}
 
 			// runtime for replay (no registries since we're just inspecting)
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 
 			const dummyBlueprint = {
 				id: 'inspection-blueprint',

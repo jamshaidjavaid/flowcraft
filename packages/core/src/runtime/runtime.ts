@@ -57,10 +57,11 @@ export class FlowRuntime<TContext extends Record<string, any>, TDependencies ext
 		return this.blueprints[id]
 	}
 
+	constructor()
 	constructor(container: DIContainer, options?: RuntimeOptions<TDependencies>)
 	constructor(options: RuntimeOptions<TDependencies>)
 	constructor(
-		containerOrOptions: DIContainer | RuntimeOptions<TDependencies>,
+		containerOrOptions?: DIContainer | RuntimeOptions<TDependencies>,
 		legacyOptions?: RuntimeOptions<TDependencies>,
 	) {
 		let userRegistry: any
@@ -79,7 +80,7 @@ export class FlowRuntime<TContext extends Record<string, any>, TDependencies ext
 			this.orchestrator = this.container.resolve<IOrchestrator>(ServiceTokens.Orchestrator)
 			this.scheduler = new WorkflowScheduler(this)
 		} else {
-			const options = containerOrOptions
+			const options = containerOrOptions || {}
 			this.logger = options.logger || new NullLogger()
 			this.serializer = options.serializer || new JsonSerializer()
 			this.evaluator = options.evaluator || new PropertyEvaluator()

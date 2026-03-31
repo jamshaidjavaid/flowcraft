@@ -35,7 +35,7 @@ const flow = createFlow('simple-workflow')
 	.edge('pause', 'double')
 
 // 3. Initialize the runtime
-const runtime = new FlowRuntime({})
+const runtime = new FlowRuntime()
 
 // 4. Run the workflow
 async function run() {

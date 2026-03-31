@@ -1,4 +1,4 @@
-import { ConsoleLogger, FlowRuntime } from 'flowcraft'
+import { FlowRuntime } from 'flowcraft'
 import { createUserProcessingWorkflow, type WorkflowContext } from './workflow'
 
 async function main() {
@@ -15,9 +15,7 @@ async function main() {
 	console.log()
 
 	// Create a runtime with console logging
-	const runtime = new FlowRuntime<WorkflowContext, Record<string, any>>({
-		logger: new ConsoleLogger(),
-	})
+	const runtime = new FlowRuntime<WorkflowContext, Record<string, any>>()
 
 	// Sample user data
 	const sampleUser = {

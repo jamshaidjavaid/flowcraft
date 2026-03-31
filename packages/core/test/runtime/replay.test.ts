@@ -408,7 +408,7 @@ describe('Workflow Replay', () => {
 			const blueprint = flow.toBlueprint()
 			const _registry = flow.getFunctionRegistry()
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const replayResult = await runtime.replay(blueprint, [], 'test-execution-id')
 
 			expect(replayResult.status).toBe('completed')

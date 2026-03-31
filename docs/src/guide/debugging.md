@@ -19,7 +19,7 @@ import { createFlow, FlowRuntime } from 'flowcraft'
 import { createStepper } from 'flowcraft/testing'
 
 it('should correctly execute step-by-step', async () => {
-  const runtime = new FlowRuntime({})
+  const runtime = new FlowRuntime()
   const flow = createFlow('test')
     .node('a', async () => ({ output: 10 }))
     .node('b', async ({ context }) => ({

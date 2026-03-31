@@ -14,7 +14,7 @@ import { InMemoryEventLogger } from './event-logger'
  *     .node('b', async ({ input }) => ({ output: input + 1 })) // Bug: returns { output: 3 }
  *     .edge('a', 'b')
  *
- *   const runtime = new FlowRuntime({})
+ *   const runtime = new FlowRuntime()
  *
  *   // If this test fails, a full, human-readable trace of the execution
  *   // (inputs, outputs, context changes) is printed to the console.

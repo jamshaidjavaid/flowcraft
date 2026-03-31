@@ -35,7 +35,7 @@ describe('Built-In Nodes', () => {
 			flow.edge('prepare', 'test-batch')
 			flow.edge('test-batch', 'verify')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			if (result.status !== 'completed') {
@@ -64,7 +64,7 @@ describe('Built-In Nodes', () => {
 			flow.edge('prepare', 'test-batch')
 			flow.edge('test-batch', 'verify')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')
@@ -101,7 +101,7 @@ describe('Built-In Nodes', () => {
 			flow.edge('prepare', 'test-batch')
 			flow.edge('test-batch', 'verify')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('failed')
@@ -121,7 +121,7 @@ describe('Built-In Nodes', () => {
 			flow.edge('prepare', 'test-batch')
 			flow.edge('test-batch', 'verify')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('failed')
@@ -139,7 +139,7 @@ describe('Built-In Nodes', () => {
 			flow.edge('prepare', 'test-batch')
 			flow.edge('test-batch', 'verify')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')
@@ -313,7 +313,7 @@ describe('Built-In Nodes', () => {
 			})
 			mainFlow.edge('input', 'test-subflow')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(mainFlow.toBlueprint(), {}, { functionRegistry: mainFlow.getFunctionRegistry() })
 
 			expect(result.status).toBe('failed')
@@ -331,7 +331,7 @@ describe('Built-In Nodes', () => {
 			})
 			mainFlow.edge('input', 'test-subflow')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(mainFlow.toBlueprint(), {}, { functionRegistry: mainFlow.getFunctionRegistry() })
 
 			expect(result.status).toBe('failed')
@@ -348,7 +348,7 @@ describe('Built-In Nodes', () => {
 			flow.edge('start', 'wait')
 			flow.edge('wait', 'end')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('awaiting')
@@ -397,7 +397,7 @@ describe('Built-In Nodes', () => {
 			flow.edge('start', 'sleep')
 			flow.edge('sleep', 'end')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('awaiting')
@@ -414,7 +414,7 @@ describe('Built-In Nodes', () => {
 			flow.edge('start', 'sleep')
 			flow.edge('sleep', 'end')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('failed')
@@ -429,7 +429,7 @@ describe('Built-In Nodes', () => {
 			flow.edge('start', 'sleep')
 			flow.edge('sleep', 'end')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('awaiting')
@@ -444,7 +444,7 @@ describe('Built-In Nodes', () => {
 			flow.edge('start', 'sleep')
 			flow.edge('sleep', 'end')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('failed')

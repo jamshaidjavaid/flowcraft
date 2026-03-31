@@ -96,17 +96,15 @@ export async function runTestingDemo() {
 	const blueprint = workflow.toBlueprint()
 
 	// Create mocks
-	const { mockLogger, mockRegistry: _mockRegistry } = createMockServices()
+	const { mockLogger, mockRegistry } = createMockServices()
 
-	// Use container to inject mocks (registry passed separately due to Flowcraft limitation)
+	// Use container to inject mocks
 	const container = createDefaultContainer({
 		logger: mockLogger,
+		registry: mockRegistry,
 	})
 
-	const runtime = new FlowRuntime({
-		logger: container.resolve(ServiceTokens.Logger) as ILogger,
-		registry: dataRegistry,
-	} as any)
+	const runtime = new FlowRuntime(container)
 
 	await runtime.run(
 		blueprint,
@@ -139,12 +137,10 @@ export async function runConfigurationDemo() {
 
 		const container = createDefaultContainer({
 			logger: testCase.logger,
+			registry: dataRegistry,
 		})
 
-		const runtime = new FlowRuntime({
-			logger: container.resolve(ServiceTokens.Logger) as ILogger,
-			registry: dataRegistry,
-		} as any)
+		const runtime = new FlowRuntime(container)
 
 		await runtime.run(
 			blueprint,

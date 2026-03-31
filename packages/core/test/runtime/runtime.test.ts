@@ -5,7 +5,7 @@ import { WorkflowState } from '../../src/runtime/state'
 
 describe('FlowRuntime', () => {
 	it('should initialize with options', () => {
-		const runtime = new FlowRuntime({})
+		const runtime = new FlowRuntime()
 		expect(runtime.options).toEqual({})
 	})
 
@@ -16,7 +16,7 @@ describe('FlowRuntime', () => {
 			edges: [],
 		}
 		const state = new WorkflowState({})
-		const runtime = new FlowRuntime({})
+		const runtime = new FlowRuntime()
 		const mockExecutor = {
 			execute: vi.fn().mockResolvedValue({
 				status: 'success',
@@ -36,7 +36,7 @@ describe('FlowRuntime', () => {
 			edges: [],
 		}
 		const state = new WorkflowState({})
-		const runtime = new FlowRuntime({})
+		const runtime = new FlowRuntime()
 		const mockExecutor = {
 			execute: vi.fn().mockRejectedValue(new Error('Execution failed')),
 		}
@@ -54,7 +54,7 @@ describe('FlowRuntime', () => {
 			],
 			edges: [{ source: 'A', target: 'B' }],
 		}
-		const runtime = new FlowRuntime({})
+		const runtime = new FlowRuntime()
 		const result = { output: 'test' }
 		const context = { type: 'sync', toJSON: vi.fn().mockReturnValue({}) } as any
 		const nextNodes = await runtime.determineNextNodes(blueprint, 'A', result, context)
@@ -80,14 +80,14 @@ describe('FlowRuntime', () => {
 		const controller = new AbortController()
 		controller.abort()
 		const blueprint = { id: 'cancel', nodes: [], edges: [] }
-		const runtime = new FlowRuntime({})
+		const runtime = new FlowRuntime()
 		const result = await runtime.run(blueprint, {}, { signal: controller.signal })
 		expect(result.status).toBe('cancelled')
 	})
 
 	describe('Scheduler Integration', () => {
 		it('should start and stop scheduler', () => {
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			runtime.startScheduler()
 			expect(runtime.scheduler).toBeDefined()
 			runtime.stopScheduler()

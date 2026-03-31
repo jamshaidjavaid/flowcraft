@@ -154,7 +154,7 @@ describe('Cross-Environment Compatibility Testing', () => {
 				}
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')
@@ -175,7 +175,7 @@ describe('Cross-Environment Compatibility Testing', () => {
 				return { output: { elapsed: 10, usedSetTimeout: true } }
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')
@@ -194,7 +194,7 @@ describe('Cross-Environment Compatibility Testing', () => {
 				return { output: { fetched: false, data: undefined, reason: 'fetch not available' } }
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')
@@ -227,7 +227,7 @@ describe('Cross-Environment Compatibility Testing', () => {
 				return { output: await context.get('storage_test') }
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')
@@ -257,7 +257,7 @@ describe('Cross-Environment Compatibility Testing', () => {
 				}
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')
@@ -308,7 +308,7 @@ describe('Cross-Environment Compatibility Testing', () => {
 				}
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')
@@ -343,7 +343,7 @@ describe('Cross-Environment Compatibility Testing', () => {
 				}
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')
@@ -374,7 +374,7 @@ describe('Cross-Environment Compatibility Testing', () => {
 				return { output: utils }
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')
@@ -418,7 +418,7 @@ describe('Cross-Environment Compatibility Testing', () => {
 				}
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')
@@ -444,7 +444,7 @@ describe('Cross-Environment Compatibility Testing', () => {
 				return { output: format }
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')
@@ -477,7 +477,7 @@ describe('Cross-Environment Compatibility Testing', () => {
 				return { output: globals }
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')
@@ -500,7 +500,7 @@ describe('Cross-Environment Compatibility Testing', () => {
 				return { output: env }
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')
@@ -530,7 +530,7 @@ describe('Cross-Environment Compatibility Testing', () => {
 				return { output: { executionOrder: results } }
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')
@@ -562,7 +562,7 @@ describe('Cross-Environment Compatibility Testing', () => {
 				return { output: { ...patterns, nextTickWorks } }
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')
@@ -592,7 +592,7 @@ describe('Cross-Environment Compatibility Testing', () => {
 				return { output: data }
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')
@@ -628,7 +628,7 @@ describe('Cross-Environment Compatibility Testing', () => {
 				return { output: { ...apis, fetchResult } }
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')

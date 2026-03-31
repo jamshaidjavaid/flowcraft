@@ -30,7 +30,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				.node('B', async (ctx) => ({ output: `${ctx.input}_B` }))
 				.edge('A', 'B')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')
@@ -50,7 +50,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				.edge('B', 'D')
 				.edge('C', 'D')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')
@@ -71,7 +71,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				.edge('B', 'D')
 				.edge('C', 'D')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('failed')
@@ -91,7 +91,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				.edge('A', 'C')
 				.edge('B', 'C')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')
@@ -107,7 +107,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				.edge('A', 'B')
 				.edge('B', 'A')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(
 				flow.toBlueprint(),
 				{},
@@ -231,7 +231,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				.node('B', async () => ({ output: 'fallback success' }))
 
 			const blueprint = flow.toBlueprint()
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(blueprint, {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')
@@ -252,7 +252,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				// This edge is for the successful case, which won't be taken.
 				.edge('failingNode', 'endNode')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')
@@ -269,7 +269,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				.edge('A', 'B')
 				.edge('B', 'A')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const promise = runtime.run(
 				flow.toBlueprint(),
 				{},
@@ -294,7 +294,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				})
 			}
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(
 				flow.toBlueprint(),
 				{},
@@ -320,7 +320,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				})
 			}
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')
@@ -342,7 +342,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				})
 			}
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(
 				flow.toBlueprint(),
 				{},
@@ -372,7 +372,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				.edge('B', 'C', { action: 'path-c' })
 				.edge('B', 'D', { action: 'path-d' })
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')
@@ -387,7 +387,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 			const flow = createFlow('save').node('A', async () => ({
 				output: 'test',
 			}))
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.context['_outputs.A']).toBe('test')
@@ -402,7 +402,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				})
 				.edge('A', 'B')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.context['_outputs.B']).toBe('data_B')
@@ -417,7 +417,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				})
 				.edge('A', 'B')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.context['_outputs.B']).toBe('value_B')
@@ -430,7 +430,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				.node('B', async (ctx) => ({ output: `${ctx.input}_B` }))
 				.edge('A', 'B')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.context['_outputs.B']).toBe('data_B')
@@ -458,7 +458,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				.edge('start', 'middle')
 				.edge('middle', 'end', { transform: 'input.deeply.nested.value' })
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			// The transform should be evaluated against start's output (via inputs: 'start'),
@@ -473,7 +473,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				.node('end', async (ctx) => ({ output: ctx.input }))
 				.edge('start', 'end', { transform: 'input.deeply.nested.value' })
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.context['_outputs.end']).toBe('extracted')
@@ -488,7 +488,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				.edge('A', 'B')
 				.edge('B', 'C', { transform: 'input.data' })
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			// When inputs: 'A' references the same node as the edge source (A->B->C with inputs: 'A'),
@@ -502,7 +502,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 			const flow = createFlow('undefined').node('A', async () => ({
 				output: undefined,
 			}))
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.context).toHaveProperty('_outputs.A')
@@ -520,7 +520,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				.edge('A', 'C')
 				.edge('B', 'C')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.context['_outputs.C']).toBe('no-input')
@@ -537,7 +537,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				.edge('A', 'B', { action: 'success' })
 				.edge('A', 'C', { action: 'fail' })
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.context['_outputs.B']).toBe('B')
@@ -585,7 +585,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				.edge('A', 'B', { action: 'known' })
 				.edge('A', 'C') // default edge
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.context['_outputs.B']).toBeUndefined()
@@ -737,7 +737,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				)
 				.edge('A', 'B')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(
 				flow.toBlueprint(),
 				{},
@@ -758,7 +758,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				return { output: 'A' }
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			await runtime.run(
 				flow.toBlueprint(),
 				{},
@@ -787,7 +787,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				],
 			])('should handle %s gracefully', async (_description, blueprintOrFactory) => {
 				const blueprint = typeof blueprintOrFactory === 'function' ? blueprintOrFactory() : blueprintOrFactory
-				const runtime = new FlowRuntime({})
+				const runtime = new FlowRuntime()
 				const result = await runtime.run(blueprint, {}, {})
 
 				expect(['completed', 'failed']).toContain(result.status)
@@ -807,7 +807,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				const flow = createFlow('node-id-test')
 				flow.node(nodeId, async () => ({ output: 'test' }))
 
-				const runtime = new FlowRuntime({})
+				const runtime = new FlowRuntime()
 				const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 				expect(result.status).toBe('completed')
@@ -831,7 +831,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				const flow = createFlow('output-test')
 				flow.node('A', async () => ({ output }))
 
-				const runtime = new FlowRuntime({})
+				const runtime = new FlowRuntime()
 				const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 				expect(result.status).toBe('completed')
@@ -855,7 +855,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 					return { output: val }
 				})
 
-				const runtime = new FlowRuntime({})
+				const runtime = new FlowRuntime()
 				const result = await runtime.run(
 					flow.toBlueprint(),
 					{ testKey: value },
@@ -885,7 +885,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 					})
 				}
 
-				const runtime = new FlowRuntime({})
+				const runtime = new FlowRuntime()
 				const result = await runtime.run(
 					flow.toBlueprint(),
 					{},
@@ -902,7 +902,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				const flow = createFlow('negative-concurrency')
 				flow.node('A', async () => ({ output: 'A' }))
 
-				const runtime = new FlowRuntime({})
+				const runtime = new FlowRuntime()
 				const result = await runtime.run(
 					flow.toBlueprint(),
 					{},
@@ -928,7 +928,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 					}
 				}
 
-				const runtime = new FlowRuntime({})
+				const runtime = new FlowRuntime()
 				const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 				expect(result.status).toBe('completed')
@@ -951,7 +951,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 					}
 				}
 
-				const runtime = new FlowRuntime({})
+				const runtime = new FlowRuntime()
 				const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 				expect(result.status).toBe('completed')
@@ -972,7 +972,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 					throw error
 				})
 
-				const runtime = new FlowRuntime({})
+				const runtime = new FlowRuntime()
 				const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 				expect(result.status).toBe('failed')
@@ -987,7 +987,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 					return 'invalid result' as any
 				})
 
-				const runtime = new FlowRuntime({})
+				const runtime = new FlowRuntime()
 				const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 				// Should either complete or fail gracefully
@@ -1020,7 +1020,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				})
 				flow.edge('A', 'B')
 
-				const runtime = new FlowRuntime({})
+				const runtime = new FlowRuntime()
 				const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 				expect(result.status).toBe('completed')
@@ -1053,7 +1053,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				flow.edge('init', `reader${i}`)
 			}
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')
@@ -1076,7 +1076,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				})
 			}
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(
 				flow.toBlueprint(),
 				{ counter: 0 },
@@ -1104,7 +1104,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				})
 			}
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(
 				flow.toBlueprint(),
 				{ array: [] },
@@ -1148,7 +1148,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				return { output: 'done2' }
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')
@@ -1180,7 +1180,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				})
 			}
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(
 				flow.toBlueprint(),
 				{ nextId: 0 },
@@ -1211,7 +1211,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				})
 			}
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(
 				flow.toBlueprint(),
 				{},
@@ -1269,7 +1269,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 			flow.edge('middle1', 'end')
 			flow.edge('middle2', 'end')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(
 				flow.toBlueprint(),
 				{},

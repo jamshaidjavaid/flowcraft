@@ -83,7 +83,7 @@ describe('Integration Tests - End-to-End Workflow Scenarios', () => {
 			flow.edge('process-payment', 'update-inventory')
 			flow.edge('update-inventory', 'send-confirmation')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 
 			const testOrder = {
 				id: 'order_123',
@@ -198,7 +198,7 @@ describe('Integration Tests - End-to-End Workflow Scenarios', () => {
 			flow.edge('send-verification-email', 'send-welcome-email')
 			flow.edge('setup-preferences', 'send-welcome-email')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 
 			const testUser = {
 				email: 'test@example.com',
@@ -314,7 +314,7 @@ describe('Integration Tests - End-to-End Workflow Scenarios', () => {
 			flow.edge('load-to-database', 'generate-report')
 			flow.edge('handle-invalid-data', 'generate-report')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(
 				flow.toBlueprint(),
 				{},
@@ -407,7 +407,7 @@ describe('Integration Tests - End-to-End Workflow Scenarios', () => {
 			flow.edge('book-car', 'cancel-bookings', { action: 'failed' })
 			flow.edge('process-payment', 'confirm-booking')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(
 				flow.toBlueprint(),
 				{},
@@ -581,7 +581,7 @@ describe('Integration Tests - End-to-End Workflow Scenarios', () => {
 
 			flow.edge('phone-screen', 'make-decision', { action: 'phone-pass' }) // Manual review leads to decision
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 
 			const testApplication = {
 				name: 'John Doe',

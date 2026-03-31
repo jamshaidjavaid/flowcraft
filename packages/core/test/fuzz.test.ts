@@ -73,7 +73,7 @@ describe('Fuzz Testing - Malformed Input Handling', () => {
 				{ nodes: { node1: { id: 'node1', config: 'invalid' } }, edges: [] },
 			]
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 
 			for (const blueprint of malformedBlueprints) {
 				try {
@@ -101,7 +101,7 @@ describe('Fuzz Testing - Malformed Input Handling', () => {
 				edges: [],
 			}
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(blueprint as any, {}, {})
 
 			// Should handle circular references gracefully
@@ -125,7 +125,7 @@ describe('Fuzz Testing - Malformed Input Handling', () => {
 				}
 			}
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(largeBlueprint, {}, {})
 
 			// Should handle large blueprints without crashing
@@ -152,7 +152,7 @@ describe('Fuzz Testing - Malformed Input Handling', () => {
 				const flow = createFlow(`fuzz-output-${Math.random()}`)
 				flow.node('test-node', outputFunc as any)
 
-				const runtime = new FlowRuntime({})
+				const runtime = new FlowRuntime()
 				const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 				// Should handle malformed outputs gracefully
@@ -179,7 +179,7 @@ describe('Fuzz Testing - Malformed Input Handling', () => {
 					throw error
 				})
 
-				const runtime = new FlowRuntime({})
+				const runtime = new FlowRuntime()
 				const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 				expect(result.status).toBe('failed')
@@ -196,7 +196,7 @@ describe('Fuzz Testing - Malformed Input Handling', () => {
 				return { output: 'completed' }
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')
@@ -227,7 +227,7 @@ describe('Fuzz Testing - Malformed Input Handling', () => {
 				randomContext[randomString(10)] = generateRandomObject()
 			}
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), randomContext, {
 				functionRegistry: flow.getFunctionRegistry(),
 			})
@@ -277,7 +277,7 @@ describe('Fuzz Testing - Malformed Input Handling', () => {
 				return { output: results }
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			// Should handle malformed keys gracefully
@@ -367,7 +367,7 @@ describe('Fuzz Testing - Malformed Input Handling', () => {
 					})
 				}
 
-				const runtime = new FlowRuntime({})
+				const runtime = new FlowRuntime()
 				const result = await runtime.run(
 					flow.toBlueprint(),
 					{},
@@ -398,7 +398,7 @@ describe('Fuzz Testing - Malformed Input Handling', () => {
 				})
 			}
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(
 				flow.toBlueprint(),
 				{ shared_counter: 0 },
@@ -437,7 +437,7 @@ describe('Fuzz Testing - Malformed Input Handling', () => {
 
 			flow.edge('large-data-producer', 'large-data-consumer')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')
@@ -475,7 +475,7 @@ describe('Fuzz Testing - Malformed Input Handling', () => {
 
 			flow.edge('deep-producer', 'deep-consumer')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 			expect(result.status).toBe('completed')
@@ -507,7 +507,7 @@ describe('Fuzz Testing - Malformed Input Handling', () => {
 				}))
 				flow.edge('unicode-producer', 'unicode-consumer')
 
-				const runtime = new FlowRuntime({})
+				const runtime = new FlowRuntime()
 				const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 				expect(result.status).toBe('completed')
@@ -529,7 +529,7 @@ describe('Fuzz Testing - Malformed Input Handling', () => {
 				const flow = createFlow(`utf8-fuzz-${Math.random()}`)
 				flow.node('malformed-producer', async () => ({ output: malformed }))
 
-				const runtime = new FlowRuntime({})
+				const runtime = new FlowRuntime()
 				const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 				// Should handle malformed UTF-8 gracefully

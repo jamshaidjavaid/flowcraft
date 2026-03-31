@@ -29,7 +29,7 @@ async function main() {
 	const blueprint = translateFlow.toBlueprint()
 	const functionRegistry = translateFlow.getFunctionRegistry()
 
-	const runtime = new FlowRuntime({})
+	const runtime = new FlowRuntime()
 
 	console.log(`Starting parallel translation into ${languages.length} languages...`)
 	const startTime = Date.now()

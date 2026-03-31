@@ -12,7 +12,7 @@ describe('createStepper', () => {
 			.node('B', async (ctx) => ({ output: `${ctx.input}_B` }))
 			.edge('A', 'B')
 
-		const runtime = new FlowRuntime({})
+		const runtime = new FlowRuntime()
 		const stepper = await createStepper(runtime, flow.toBlueprint(), flow.getFunctionRegistry(), {})
 
 		expect(stepper.state).toBeDefined()
@@ -26,7 +26,7 @@ describe('createStepper', () => {
 			.node('B', async (ctx) => ({ output: `${ctx.input}_B` }))
 			.edge('A', 'B')
 
-		const runtime = new FlowRuntime({})
+		const runtime = new FlowRuntime()
 		const stepper = await createStepper(runtime, flow.toBlueprint(), flow.getFunctionRegistry(), {})
 
 		// First step: execute node A
@@ -55,7 +55,7 @@ describe('createStepper', () => {
 			.node('A', async () => ({ output: 'resultA' }))
 			.node('B', async () => ({ output: 'resultB' }))
 
-		const runtime = new FlowRuntime({})
+		const runtime = new FlowRuntime()
 		const stepper = await createStepper(runtime, flow.toBlueprint(), flow.getFunctionRegistry(), {})
 
 		// First step: execute both A and B in parallel
@@ -82,7 +82,7 @@ describe('createStepper', () => {
 			.edge('B', 'D')
 			.edge('C', 'D')
 
-		const runtime = new FlowRuntime({})
+		const runtime = new FlowRuntime()
 		const stepper = await createStepper(runtime, flow.toBlueprint(), flow.getFunctionRegistry(), {})
 		const getOutputs = () => stepper.state.getContext().toJSON()
 
@@ -120,7 +120,7 @@ describe('createStepper', () => {
 			output: (await ctx.context.get('value')) || 'default',
 		}))
 
-		const runtime = new FlowRuntime({})
+		const runtime = new FlowRuntime()
 		const stepper = await createStepper(runtime, flow.toBlueprint(), flow.getFunctionRegistry(), { value: 'initial' })
 
 		const result = await stepper.next()
@@ -135,7 +135,7 @@ describe('createStepper', () => {
 			.node('B', async (ctx) => ({ output: (ctx.input as number) + 1 }))
 			.edge('A', 'B')
 
-		const runtime = new FlowRuntime({})
+		const runtime = new FlowRuntime()
 		const stepper = await createStepper(runtime, flow.toBlueprint(), flow.getFunctionRegistry())
 
 		await stepper.next()
@@ -160,7 +160,7 @@ describe('createStepper', () => {
 			.node('B', async () => ({ output: 'B' }))
 			.edge('A', 'B')
 
-		const runtime = new FlowRuntime({})
+		const runtime = new FlowRuntime()
 		const stepper = await createStepper(runtime, flow.toBlueprint(), flow.getFunctionRegistry())
 
 		// Initial state
@@ -208,7 +208,7 @@ describe('createStepper', () => {
 			.edge('A', 'B')
 			.edge('B', 'C')
 
-		const runtime = new FlowRuntime({})
+		const runtime = new FlowRuntime()
 		const stepper = await createStepper(runtime, flow.toBlueprint(), flow.getFunctionRegistry(), {})
 
 		// Step 1: Execute A
@@ -258,7 +258,7 @@ describe('createStepper', () => {
 
 	it('should handle durable primitives', async () => {
 		// Test sleep node
-		const runtime = new FlowRuntime({})
+		const runtime = new FlowRuntime()
 		const flow = createFlow('durable-test').node('sleep', SleepNode, { params: { duration: '5m' } })
 
 		const stepper = await createStepper(runtime, flow.toBlueprint(), flow.getFunctionRegistry(), {})
@@ -268,7 +268,7 @@ describe('createStepper', () => {
 	})
 
 	it('should handle waitForEvent node', async () => {
-		const runtime = new FlowRuntime({})
+		const runtime = new FlowRuntime()
 		const flow = createFlow('wait-test').wait('wait', { params: { eventName: 'test_event' } })
 
 		const stepper = await createStepper(runtime, flow.toBlueprint(), flow.getFunctionRegistry(), {})
@@ -304,7 +304,7 @@ describe('createStepper', () => {
 	})
 
 	it('should handle webhook.request wait node', async () => {
-		const runtime = new FlowRuntime({})
+		const runtime = new FlowRuntime()
 		const flow = createFlow('webhook-wait-test').wait('wait_webhook', {
 			params: { eventName: 'webhook:webhook_1' },
 		})

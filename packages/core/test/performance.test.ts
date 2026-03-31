@@ -26,7 +26,7 @@ describe('Performance and Resource Testing', () => {
 			flow.node('B', async () => ({ output: 'B' }))
 			flow.edge('A', 'B')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const executionTime = await measureExecutionTime(() =>
 				runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() }),
 			)
@@ -55,7 +55,7 @@ describe('Performance and Resource Testing', () => {
 					}
 				}
 
-				const runtime = new FlowRuntime({})
+				const runtime = new FlowRuntime()
 				const time = await measureExecutionTime(() =>
 					runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() }),
 				)
@@ -80,7 +80,7 @@ describe('Performance and Resource Testing', () => {
 				})
 			}
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 
 			// Test with concurrency 1 (sequential)
 			const sequentialTime = await measureExecutionTime(() =>
@@ -127,7 +127,7 @@ describe('Performance and Resource Testing', () => {
 					}
 				}
 
-				const runtime = new FlowRuntime({})
+				const runtime = new FlowRuntime()
 				await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
 				const memoryAfter = getMemoryUsage()
@@ -166,7 +166,7 @@ describe('Performance and Resource Testing', () => {
 				}
 			}
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const memoryBefore = getMemoryUsage()
 
 			await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
@@ -189,7 +189,7 @@ describe('Performance and Resource Testing', () => {
 				return { output: `processed_${input}` }
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const concurrentRuns = 20
 			const startTime = performance.now()
 
@@ -219,7 +219,7 @@ describe('Performance and Resource Testing', () => {
 				return { output: 'burst-result' }
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const burstSize = 50
 			const startTime = performance.now()
 
@@ -256,7 +256,7 @@ describe('Performance and Resource Testing', () => {
 				return { output: 'memory-intensive-result' }
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const memoryBefore = getMemoryUsage()
 
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
@@ -282,7 +282,7 @@ describe('Performance and Resource Testing', () => {
 				return { output: result }
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const startTime = performance.now()
 
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
@@ -313,7 +313,7 @@ describe('Performance and Resource Testing', () => {
 			flow.edge('input', 'process')
 			flow.edge('process', 'output')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			let result: any
 			const executionTime = await measureExecutionTime(async () => {
 				result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
@@ -339,7 +339,7 @@ describe('Performance and Resource Testing', () => {
 				return { output: 'context-ops-done' }
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 			const executionTime = await measureExecutionTime(() =>
 				runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() }),
 			)

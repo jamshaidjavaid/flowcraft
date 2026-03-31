@@ -226,7 +226,7 @@ describe('Security Boundaries', () => {
 				})
 				.edge('loop', 'loop')
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 
 			// The runtime prevents infinite loops by not re-executing completed nodes
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
@@ -239,7 +239,7 @@ describe('Security Boundaries', () => {
 				throw new Error('Bad implementation')
 			}) as any)
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 			expect(result.status).toBe('failed')
@@ -254,7 +254,7 @@ describe('Security Boundaries', () => {
 				return { output: 'processed' }
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 			expect(result.status).toBe('completed')
@@ -270,7 +270,7 @@ describe('Security Boundaries', () => {
 				throw error
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
@@ -285,7 +285,7 @@ describe('Security Boundaries', () => {
 				throw new Error('Error from external API: sensitive data leaked')
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
 
@@ -304,7 +304,7 @@ describe('Security Boundaries', () => {
 				{ nodes: [{ id: 'test' }], edges: [] }, // Missing uses
 			]
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 
 			for (const blueprint of invalidBlueprints) {
 				const result = await runtime.run(blueprint as any)
@@ -318,7 +318,7 @@ describe('Security Boundaries', () => {
 				config: { maxRetries: -1 }, // Invalid negative retries
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 
 			// Should either reject or handle gracefully
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })
@@ -334,7 +334,7 @@ describe('Security Boundaries', () => {
 				return { output: 'test' }
 			})
 
-			const runtime = new FlowRuntime({})
+			const runtime = new FlowRuntime()
 
 			// Should handle circular references without crashing
 			const result = await runtime.run(flow.toBlueprint(), {}, { functionRegistry: flow.getFunctionRegistry() })

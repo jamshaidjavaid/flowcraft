@@ -30,15 +30,17 @@ npm install flowcraft
 Define and run a simple workflow in a few lines of code.
 
 ```typescript
-import { createFlow, FlowRuntime } from 'flowcraft'
+import { createFlow, FlowRuntime, type NodeContext } from 'flowcraft'
 
 // 1. Define your functions for the nodes
 async function startNode({ context }: NodeContext) {
 	const output = await context.get('value')
 	return { output }
 }
-async function doubleNode({ input }: NodeContext) {
-	return { output: input * 2 }
+async function doubleNode({ input, context }: NodeContext) {
+	const output = input * 2
+	context.set('double', output)
+	return { output }
 }
 
 // 2. Define the workflow structure
@@ -52,7 +54,7 @@ const runtime = new FlowRuntime()
 
 // 4. Execute the workflow
 async function run() {
-	const result = await runtime.run(blueprint, { value: 42 })
+	const result = await flow.run(runtime, { value: 42 })
 	console.log(result.context) // { start: 42, double: 84 }
 	console.log(result.status) // 'completed'
 }

@@ -14,7 +14,7 @@ describe('SleepNode output passthrough', () => {
 			.edge('start', 'pause')
 			.edge('pause', 'double')
 
-		const runtime = new FlowRuntime({})
+		const runtime = new FlowRuntime()
 
 		const result1 = await flow.run(runtime)
 		expect(result1.status).toBe('awaiting')

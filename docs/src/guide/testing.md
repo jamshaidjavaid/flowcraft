@@ -60,7 +60,7 @@ describe('User Processing Workflow', () => {
       }))
       .edge('fetch', 'format')
 
-    const runtime = new FlowRuntime({})
+    const runtime = new FlowRuntime()
 
     // The 'runWithTrace' helper will catch the error from the 'format' node
     // and print a full execution trace before the test fails.
