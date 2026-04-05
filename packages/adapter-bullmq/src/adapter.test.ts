@@ -83,3 +83,64 @@ describe('BullMQAdapter - Testcontainers Integration', () => {
 		})
 	})
 })
+
+describe('BullMQAdapter - State Key TTL', () => {
+	let redisContainer: StartedRedisContainer
+	let redis: Redis
+
+	beforeAll(async () => {
+		redisContainer = await new RedisContainer('redis:8.2.2').start()
+		redis = new Redis(redisContainer.getConnectionUrl())
+	}, 30000)
+
+	afterAll(async () => {
+		await redis.quit()
+		await redisContainer.stop()
+	})
+
+	it('should apply stateTtlSeconds TTL to both state and status keys after a run finishes', async () => {
+		const runId = 'ttl-run'
+		const coordinationStore = new RedisCoordinationStore(redis)
+		const adapter = new BullMQAdapter({
+			connection: redis,
+			queueName: 'ttl-test-queue',
+			coordinationStore,
+			runtimeOptions: {},
+			stateTtlSeconds: 300,
+		})
+
+		await redis.hset(`workflow:state:${runId}`, 'someKey', 'someValue')
+		await (adapter as any).publishFinalResult(runId, { status: 'completed' })
+
+		const statusTtl = await redis.ttl(`workflow:status:${runId}`)
+		const stateTtl = await redis.ttl(`workflow:state:${runId}`)
+
+		expect(statusTtl).toBeGreaterThan(300 - 5)
+		expect(statusTtl).toBeLessThanOrEqual(300)
+		expect(stateTtl).toBeGreaterThan(300 - 5)
+		expect(stateTtl).toBeLessThanOrEqual(300)
+
+		await adapter.close()
+	})
+
+	it('should not set a TTL when stateTtlSeconds is 0 (persist indefinitely)', async () => {
+		const runId = 'ttl-disabled-run'
+		const coordinationStore = new RedisCoordinationStore(redis)
+		const adapter = new BullMQAdapter({
+			connection: redis,
+			queueName: 'ttl-test-queue-2',
+			coordinationStore,
+			runtimeOptions: {},
+			stateTtlSeconds: 0,
+		})
+
+		await redis.hset(`workflow:state:${runId}`, 'someKey', 'someValue')
+		await (adapter as any).publishFinalResult(runId, { status: 'completed' })
+
+		// TTL of -1 means the key exists with no expiry
+		expect(await redis.ttl(`workflow:status:${runId}`)).toBe(-1)
+		expect(await redis.ttl(`workflow:state:${runId}`)).toBe(-1)
+
+		await adapter.close()
+	})
+})
