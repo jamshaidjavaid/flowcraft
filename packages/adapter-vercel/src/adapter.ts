@@ -9,6 +9,7 @@ export interface VercelQueueAdapterOptions extends AdapterOptions {
 	contextKeyPrefix?: string
 	statusKeyPrefix?: string
 	contextTtlSeconds?: number
+	statusTtlSeconds?: number
 }
 
 function getStatusKey(runId: string, prefix = 'flowcraft:status:'): string {
@@ -27,6 +28,7 @@ export class VercelQueueAdapter extends BaseDistributedAdapter {
 	private readonly contextKeyPrefix: string
 	private readonly statusKeyPrefix: string
 	private readonly contextTtlSeconds: number
+	private readonly statusTtlSeconds: number
 
 	constructor(options: VercelQueueAdapterOptions) {
 		super(options)
@@ -35,6 +37,7 @@ export class VercelQueueAdapter extends BaseDistributedAdapter {
 		this.contextKeyPrefix = options.contextKeyPrefix ?? 'flowcraft:context:'
 		this.statusKeyPrefix = options.statusKeyPrefix ?? 'flowcraft:status:'
 		this.contextTtlSeconds = options.contextTtlSeconds ?? 86400
+		this.statusTtlSeconds = options.statusTtlSeconds ?? 86400
 		this.logger.info(`[VercelQueueAdapter] Initialized for topic: ${this.topicName}`)
 	}
 
@@ -57,7 +60,7 @@ export class VercelQueueAdapter extends BaseDistributedAdapter {
 			const status = current ? JSON.parse(current) : {}
 			status.status = 'running'
 			status.lastUpdated = Math.floor(Date.now() / 1000)
-			await this.redis.set(statusKey, JSON.stringify(status), 'EX', 86400)
+			await this.redis.set(statusKey, JSON.stringify(status), 'EX', this.statusTtlSeconds)
 		} catch (error) {
 			this.logger.error(
 				`[VercelQueueAdapter] Failed to update lastUpdated timestamp for Run ID ${_runId}`,
@@ -81,7 +84,7 @@ export class VercelQueueAdapter extends BaseDistributedAdapter {
 			status: result.status,
 			lastUpdated: Math.floor(Date.now() / 1000),
 		}
-		await this.redis.set(statusKey, JSON.stringify(status), 'EX', 86400)
+		await this.redis.set(statusKey, JSON.stringify(status), 'EX', this.statusTtlSeconds)
 		this.logger.info(`[VercelQueueAdapter] Published final result for Run ID ${runId}.`)
 	}
 

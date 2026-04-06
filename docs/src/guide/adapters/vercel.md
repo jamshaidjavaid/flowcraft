@@ -79,6 +79,8 @@ const adapter = new VercelQueueAdapter({
 	redisClient: redis,
 	topicName: 'flowcraft-jobs',
 	coordinationStore,
+	contextTtlSeconds: 86400, // Optional: TTL for context keys (default: 86400 / 24h)
+	statusTtlSeconds: 86400, // Optional: TTL for status keys (default: 86400 / 24h)
 	runtimeOptions: {
 		blueprints: {
 			/* your blueprints */
@@ -168,6 +170,16 @@ async function reconcile() {
 	console.log(`Reconciled ${stats.reconciledRuns} of ${stats.stalledRuns} stalled runs.`)
 }
 ```
+
+## Key Retention
+
+The adapter applies a TTL to all Redis keys to prevent unbounded storage growth:
+
+- **`contextTtlSeconds`**: How long context keys (`flowcraft:context:${runId}:*`) are retained. Defaults to `86400` (24 hours).
+- **`statusTtlSeconds`**: How long status keys (`flowcraft:status:${runId}`) are retained. Defaults to `86400` (24 hours).
+- Coordination keys use their own TTLs managed by the `VercelKvCoordinationStore`.
+
+Both options can be set on the adapter constructor. The TTL is applied when context is created and when status is updated during job processing and on final result publication.
 
 ## Key Components
 
