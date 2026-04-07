@@ -74,8 +74,24 @@ export class GraphTraverser {
 		const completedNodes = state.getCompletedNodes()
 		traverser.completedNodes = new Set(completedNodes)
 
+		// Identify nodes whose conditional edges were already evaluated during a prior run.
+		// If ALL incoming edges from completed predecessors have conditions, the routing
+		// decision was already made — don't re-add them to the frontier.
+		// nodes whose conditional edges were already evaluated during a prior run
+		const hasOnlyConditionalIncomingEdges = (nodeId: string): boolean => {
+			const incomingEdges = blueprint.edges.filter((e) => e.target === nodeId)
+			if (incomingEdges.length === 0) return false
+			const fromCompletedPredecessors = incomingEdges.filter((e) =>
+				completedNodes.has(e.source),
+			)
+			if (fromCompletedPredecessors.length === 0) return false
+			return fromCompletedPredecessors.every((e) => e.condition !== undefined)
+		}
+
 		for (const node of traverser.dynamicBlueprint.nodes) {
 			if (traverser.completedNodes.has(node.id)) continue
+
+			if (hasOnlyConditionalIncomingEdges(node.id)) continue
 
 			const requiredPredecessors = traverser.allPredecessors.get(node.id)
 			const joinStrategy = traverser.getJoinStrategy(node.id)
@@ -206,6 +222,11 @@ export class GraphTraverser {
 		if (nextNodes.length === 0) {
 			for (const [potentialNextId, predecessors] of this.allPredecessors) {
 				if (predecessors.has(nodeId) && !this.completedNodes.has(potentialNextId)) {
+					const hasConditionalIncomingEdge = this.dynamicBlueprint.edges.some(
+						(e) => e.target === potentialNextId && e.condition,
+					)
+					if (hasConditionalIncomingEdge) continue
+
 					const joinStrategy = this.getJoinStrategy(potentialNextId)
 					const isReady =
 						joinStrategy === 'any'
