@@ -43,6 +43,26 @@ export class PropertyEvaluator implements IEvaluator {
 }
 
 /**
+ * Rewrites an expression so that hyphenated identifiers use bracket notation.
+ * E.g. "foo-bar.total" → 'context["foo-bar"].total'
+ */
+function rewriteHyphenatedIdentifiers(expression: string, hyphenatedKeys: string[]): string {
+	let result = expression
+	// sort by len desc to avoid partial replacements
+	const sortedKeys = [...hyphenatedKeys].toSorted((a, b) => b.length - a.length)
+	for (const key of sortedKeys) {
+		if (!key.includes('-')) continue
+		const regex = new RegExp(`(?<![\\w$])${escapeRegex(key)}(?![\\w$-])`, 'g')
+		result = result.replace(regex, `context["${key}"]`)
+	}
+	return result
+}
+
+function escapeRegex(str: string): string {
+	return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+/**
  * @warning This evaluator uses `new Function()` and can execute arbitrary
  * JavaScript code. It poses a significant security risk if the expressions
  * are not from a trusted source (e.g., user input).
@@ -59,14 +79,22 @@ export class UnsafeEvaluator implements IEvaluator {
 			// filter out keys that aren't valid JavaScript identifiers
 			const validIdentifierRegex = /^[a-z_$][\w$]*$/i
 			const validKeys = Object.keys(context).filter((key) => validIdentifierRegex.test(key))
+			const hyphenatedKeys = Object.keys(context).filter(
+				(key) => !validIdentifierRegex.test(key) && /^[a-zA-Z0-9_$-]+$/.test(key),
+			)
 			const validContext: Record<string, any> = {}
 			for (const key of validKeys) {
 				validContext[key] = context[key]
 			}
+			for (const key of hyphenatedKeys) {
+				validContext[key] = context[key]
+			}
+
+			let rewrittenExpression = rewriteHyphenatedIdentifiers(expression, hyphenatedKeys)
 
 			// sandboxed function prevents access to global scope (e.g., `window`, `process`).
-			const sandbox = new Function(...validKeys, `return ${expression}`)
-			return sandbox(...validKeys.map((k) => validContext[k]))
+			const sandbox = new Function('context', ...validKeys, `return ${rewrittenExpression}`)
+			return sandbox(validContext, ...validKeys.map((k) => validContext[k]))
 		} catch (error) {
 			console.error(`Error evaluating expression "${expression}":`, error)
 			// default to a "falsy" value.
