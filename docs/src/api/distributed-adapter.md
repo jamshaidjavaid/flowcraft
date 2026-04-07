@@ -51,6 +51,8 @@ interface JobPayload {
 	runId: string
 	blueprintId: string
 	nodeId: string
+	attempt?: number
+	isLastAttempt?: boolean
 }
 ```
 

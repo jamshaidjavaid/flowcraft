@@ -22,16 +22,16 @@ export class NodeExecutorFactory {
 			})
 		}
 
-		const strategy = this.getExecutionStrategy(nodeDef, context.nodeRegistry)
+		const strategy = this.getExecutionStrategy(nodeDef, context)
 
 		return new NodeExecutor({ context, nodeDef, strategy })
 	}
 
 	private getExecutionStrategy(
 		nodeDef: NodeDefinition,
-		nodeRegistry: Map<string, NodeFunction | NodeClass>,
+		context: ExecutionContext<any, any>,
 	): ExecutionStrategy {
-		const implementation = nodeRegistry.get(nodeDef.uses)
+		const implementation = context.nodeRegistry.get(nodeDef.uses)
 		if (!implementation) {
 			throw new FlowcraftError(`Implementation for '${nodeDef.uses}' not found.`, {
 				nodeId: nodeDef.id,
@@ -40,7 +40,14 @@ export class NodeExecutorFactory {
 			})
 		}
 
-		const maxRetries = nodeDef.config?.maxRetries ?? 1
+		let maxRetries = nodeDef.config?.maxRetries ?? 1
+		const adapter = context.services.dependencies?.adapter
+		if (adapter && typeof adapter.shouldRetryInProcess === 'function') {
+			if (!adapter.shouldRetryInProcess(nodeDef)) {
+				maxRetries = 1
+			}
+		}
+
 		return isNodeClass(implementation)
 			? new ClassNodeExecutor(implementation, maxRetries, this.eventBus)
 			: new FunctionNodeExecutor(implementation, maxRetries, this.eventBus)

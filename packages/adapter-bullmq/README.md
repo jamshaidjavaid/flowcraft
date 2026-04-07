@@ -58,6 +58,7 @@ const adapter = new BullMQAdapter({
 	coordinationStore,
 	connection: redisConnection,
 	queueName: 'my-workflow-queue', // Optional: defaults to 'flowcraft-queue'
+	retryMode: 'queue', // Optional: delegates maxRetries to BullMQ natively (defaults to 'in-process')
 })
 
 // 6. Start the worker to begin processing jobs
@@ -72,6 +73,13 @@ console.log('Flowcraft worker with BullMQ adapter is running...')
 - **`RedisContext`**: An `IAsyncContext` implementation that stores and retrieves workflow state from a Redis Hash, where each workflow run has its own hash key.
 - **`RedisCoordinationStore`**: An `ICoordinationStore` implementation that uses Redis to handle atomic operations for distributed coordination.
 - **`createBullMQReconciler`**: A utility function for creating a reconciler that scans Redis for stalled workflows and resumes them.
+
+## Queue-Native Retries
+
+By default, Flowcraft retries failing nodes synchronously inside the worker process. In distributed environments, this can hold worker concurrency slots hostage during backoff delays.
+
+You can offload retries to BullMQ's native attempts and backoff scheduling by setting `retryMode: 'queue'` in the adapter configuration. 
+When enabled, BullMQ will apply exponential backoff according to your node's `maxRetries` and `retryDelay` configs without stalling the Node.js process. It supports full idempotency, effectively resuming exactly where the crash or stall occurred.
 
 ## Reconciliation
 
