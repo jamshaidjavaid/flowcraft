@@ -1,4 +1,4 @@
-import type { ConnectionOptions, Job } from 'bullmq'
+import type { ConnectionOptions, Job, JobsOptions } from 'bullmq'
 import { Queue, Worker } from 'bullmq'
 import type { AdapterOptions, JobPayload } from 'flowcraft'
 import { BaseDistributedAdapter } from 'flowcraft'
@@ -21,6 +21,12 @@ export interface BullMQAdapterOptions extends AdapterOptions {
 	 * Defaults to `86400` (24 hours). Set to `0` to disable TTL entirely
 	 */
 	stateTtlSeconds?: number
+	/**
+	 * Determines where `maxRetries` configured on a node is executed.
+	 * - `in-process`: Retries block the worker while synchronously backoff delaying (Default)
+	 * - `queue`: Retries are returned to BullMQ as a failure, generating a native new retry Job
+	 */
+	retryMode?: 'in-process' | 'queue'
 }
 
 export class BullMQAdapter extends BaseDistributedAdapter {
@@ -29,6 +35,7 @@ export class BullMQAdapter extends BaseDistributedAdapter {
 	private readonly queue: Queue
 	private readonly queueName: string
 	private readonly stateTtlSeconds: number
+	private readonly retryMode: 'in-process' | 'queue'
 	private worker?: Worker
 
 	constructor(options: BullMQAdapterOptions) {
@@ -43,6 +50,7 @@ export class BullMQAdapter extends BaseDistributedAdapter {
 			options.stateTtlSeconds !== undefined
 				? options.stateTtlSeconds
 				: DEFAULT_STATE_TTL_SECONDS
+		this.retryMode = options.retryMode || 'in-process'
 		this.queue = new Queue(this.queueName, {
 			connection: this.redisClient as ConnectionOptions,
 		})
@@ -53,6 +61,10 @@ export class BullMQAdapter extends BaseDistributedAdapter {
 		return new RedisContext(this.redisClient, runId)
 	}
 
+	protected shouldRetryInProcess(_nodeDef: any): boolean {
+		return this.retryMode !== 'queue'
+	}
+
 	protected processJobs(handler: (job: JobPayload) => Promise<void>): void {
 		this.worker = new Worker(
 			this.queueName,
@@ -60,7 +72,20 @@ export class BullMQAdapter extends BaseDistributedAdapter {
 				this.logger.info(
 					`[BullMQAdapter] ==> Picked up job ID: ${job.id}, Name: ${job.name}`,
 				)
-				await handler(job.data as JobPayload)
+
+				const optsAttempts = job.opts.attempts || 1
+				const attemptsMade = job.attemptsMade || 0
+				const isLastAttempt =
+					this.retryMode === 'queue' ? attemptsMade >= optsAttempts - 1 : true
+				const attempt = attemptsMade + 1
+
+				const payload: JobPayload = {
+					...job.data,
+					isLastAttempt,
+					attempt,
+				}
+
+				await handler(payload)
 			},
 			{ connection: this.redisClient as ConnectionOptions, concurrency: 5 },
 		)
@@ -69,7 +94,22 @@ export class BullMQAdapter extends BaseDistributedAdapter {
 	}
 
 	protected async enqueueJob(job: JobPayload): Promise<void> {
-		await this.queue.add('executeNode', job)
+		const nodeDef = this.runtime.options.blueprints?.[job.blueprintId]?.nodes.find(
+			(n) => n.id === job.nodeId,
+		)
+		const opts: JobsOptions = {
+			jobId: `${job.runId}_${job.nodeId}`, // Idempotency deduplication
+		}
+
+		if (this.retryMode === 'queue') {
+			opts.attempts = nodeDef?.config?.maxRetries ?? 1
+			opts.backoff = {
+				type: 'exponential',
+				delay: nodeDef?.config?.retryDelay ?? 1000,
+			}
+		}
+
+		await this.queue.add('executeNode', job, opts)
 	}
 
 	protected async publishFinalResult(runId: string, result: any): Promise<void> {

@@ -7,6 +7,7 @@ import type {
 	IEventBus,
 	ILogger,
 	ISerializer,
+	NodeDefinition,
 	NodeResult,
 	RuntimeOptions,
 	WorkflowBlueprint,
@@ -44,6 +45,10 @@ export interface JobPayload {
 	runId: string
 	blueprintId: string
 	nodeId: string
+	/** Used to suppress intermediate failures and fallback triggers when delegating to Queue retries */
+	isLastAttempt?: boolean
+	/** Optional attempt tracking metadata */
+	attempt?: number
 }
 
 /**
@@ -79,6 +84,15 @@ export abstract class BaseDistributedAdapter {
 	public start(): void {
 		this.logger.info('[Adapter] Starting worker...')
 		this.processJobs(this.handleJob.bind(this))
+	}
+
+	/**
+	 * Hook called by the execution factory to determine if a node's automatic
+	 * retries should be executed synchronously in-process (true) or delegated
+	 * to the Queue backoff behavior configured by the adapter (false).
+	 */
+	protected shouldRetryInProcess(_nodeDef: NodeDefinition): boolean {
+		return true // Default backward compatible behavior
 	}
 
 	/**
@@ -189,20 +203,27 @@ export abstract class BaseDistributedAdapter {
 		try {
 			const contextData = await context.toJSON()
 			const state = new WorkflowState(contextData, context)
+			state.isLastAttempt = job.isLastAttempt !== false
 
-			const result: NodeResult<any, any> = await this.runtime.executeNode(
-				blueprint,
-				nodeId,
-				state,
-			)
-			await context.set(`_outputs.${nodeId}` as any, result.output)
+			let result: NodeResult<any, any>
 
-			const stateContext = state.getContext()
-			if (stateContext instanceof TrackedAsyncContext) {
-				const deltas = stateContext.getDeltas()
-				if (deltas.length > 0) {
-					await stateContext.patch(deltas)
-					stateContext.clearDeltas()
+			const alreadyCompleted = await context.has(`_outputs.${nodeId}`)
+			if (alreadyCompleted) {
+				this.logger.info(
+					`[Adapter] Node '${nodeId}' already completed, skipping re-execution.`,
+				)
+				result = { output: await context.get(`_outputs.${nodeId}`) }
+			} else {
+				result = await this.runtime.executeNode(blueprint, nodeId, state)
+				await context.set(`_outputs.${nodeId}` as any, result.output)
+
+				const stateContext = state.getContext()
+				if (stateContext instanceof TrackedAsyncContext) {
+					const deltas = stateContext.getDeltas()
+					if (deltas.length > 0) {
+						await stateContext.patch(deltas)
+						stateContext.clearDeltas()
+					}
 				}
 			}
 
@@ -295,12 +316,11 @@ export abstract class BaseDistributedAdapter {
 				})
 			}
 		} catch (error: any) {
+
 			const reason = error.message || 'Unknown execution error'
 			this.logger.error(
 				`[Adapter] FATAL: Job for node '${nodeId}' failed for Run ID '${runId}': ${reason}`,
 			)
-			await this.publishFinalResult(runId, { status: 'failed', reason })
-			await this.writePoisonPillForSuccessors(runId, blueprint, nodeId)
 
 			if (this.eventBus) {
 				await this.eventBus.emit({
@@ -308,6 +328,16 @@ export abstract class BaseDistributedAdapter {
 					payload: { runId, blueprintId, nodeId, error },
 				})
 			}
+
+			if (job.isLastAttempt === false) {
+				this.logger.warn(
+					`[Adapter] Job for node '${nodeId}' failed (queue attempt ${job.attempt || 1}), delegating retry to queue.`,
+				)
+				return
+			}
+
+			await this.publishFinalResult(runId, { status: 'failed', reason })
+			await this.writePoisonPillForSuccessors(runId, blueprint, nodeId)
 		} finally {
 			clearInterval(heartbeatInterval)
 		}

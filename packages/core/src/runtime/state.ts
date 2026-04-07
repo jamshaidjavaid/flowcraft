@@ -10,6 +10,7 @@ export class WorkflowState<TContext extends Record<string, any>> {
 	private _isAwaiting = false
 	private _awaitingNodeIds = new Set<string>()
 	private _awaitingDetails = new Map<string, any>()
+	public isLastAttempt?: boolean
 
 	constructor(initialData: Partial<TContext>, context?: IAsyncContext<TContext>) {
 		if (context) {

@@ -263,7 +263,8 @@ export class NodeExecutor<
 							})
 
 				const fallbackNodeId = this.nodeDef.config?.fallback
-				if (fallbackNodeId && !flowcraftError.isFatal) {
+				const isLastAttempt = this.context.state.isLastAttempt ?? true
+				if (fallbackNodeId && !flowcraftError.isFatal && isLastAttempt) {
 					this.context.services.logger.warn(`Node failed, fallback required`, {
 						nodeId: this.nodeDef.id,
 						fallbackNodeId,
