@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { InMemoryEventLogger } from '../../src/testing/event-logger'
 import type { FlowcraftEvent } from '../../src/types'
+import { FlowcraftError } from '../../src/errors'
 
 describe('InMemoryEventLogger', () => {
 	it('should capture events via emit', async () => {
@@ -17,8 +18,14 @@ describe('InMemoryEventLogger', () => {
 
 	it('should clear all captured events', () => {
 		const logger = new InMemoryEventLogger()
-		logger.events.push({ type: 'workflow:start', payload: { blueprintId: 'test' } })
-		logger.events.push({ type: 'node:start', payload: { nodeId: 'A' } })
+		logger.events.push({
+			type: 'workflow:start',
+			payload: { blueprintId: 'test', executionId: 'exec-1' },
+		})
+		logger.events.push({
+			type: 'node:start',
+			payload: { nodeId: 'A', executionId: 'exec-1', input: {}, blueprintId: 'test' },
+		})
 
 		logger.clear()
 		expect(logger.events).toHaveLength(0)
@@ -27,9 +34,23 @@ describe('InMemoryEventLogger', () => {
 	it('should find the first event of a specific type', async () => {
 		const logger = new InMemoryEventLogger()
 
-		await logger.emit({ type: 'workflow:start', payload: { blueprintId: 'test' } })
-		await logger.emit({ type: 'node:start', payload: { nodeId: 'A' } })
-		await logger.emit({ type: 'node:finish', payload: { nodeId: 'A', result: { output: 1 } } })
+		await logger.emit({
+			type: 'workflow:start',
+			payload: { blueprintId: 'test', executionId: 'exec-1' },
+		})
+		await logger.emit({
+			type: 'node:start',
+			payload: { nodeId: 'A', executionId: 'exec-1', input: {}, blueprintId: 'test' },
+		})
+		await logger.emit({
+			type: 'node:finish',
+			payload: {
+				nodeId: 'A',
+				result: { output: 1 },
+				executionId: 'exec-1',
+				blueprintId: 'test',
+			},
+		})
 
 		const found = logger.find('node:start')
 		expect(found).toBeDefined()
@@ -39,7 +60,10 @@ describe('InMemoryEventLogger', () => {
 	it('should return undefined when find has no match', async () => {
 		const logger = new InMemoryEventLogger()
 
-		await logger.emit({ type: 'workflow:start', payload: { blueprintId: 'test' } })
+		await logger.emit({
+			type: 'workflow:start',
+			payload: { blueprintId: 'test', executionId: 'exec-1' },
+		})
 
 		const found = logger.find('node:error')
 		expect(found).toBeUndefined()
@@ -48,10 +72,27 @@ describe('InMemoryEventLogger', () => {
 	it('should filter events by type', async () => {
 		const logger = new InMemoryEventLogger()
 
-		await logger.emit({ type: 'workflow:start', payload: { blueprintId: 'test' } })
-		await logger.emit({ type: 'node:start', payload: { nodeId: 'A' } })
-		await logger.emit({ type: 'node:start', payload: { nodeId: 'B' } })
-		await logger.emit({ type: 'node:finish', payload: { nodeId: 'A', result: { output: 1 } } })
+		await logger.emit({
+			type: 'workflow:start',
+			payload: { blueprintId: 'test', executionId: 'exec-1' },
+		})
+		await logger.emit({
+			type: 'node:start',
+			payload: { nodeId: 'A', executionId: 'exec-1', input: {}, blueprintId: 'test' },
+		})
+		await logger.emit({
+			type: 'node:start',
+			payload: { nodeId: 'B', executionId: 'exec-1', input: {}, blueprintId: 'test' },
+		})
+		await logger.emit({
+			type: 'node:finish',
+			payload: {
+				nodeId: 'A',
+				result: { output: 1 },
+				executionId: 'exec-1',
+				blueprintId: 'test',
+			},
+		})
 
 		const startEvents = logger.filter('node:start')
 		expect(startEvents).toHaveLength(2)
@@ -62,7 +103,10 @@ describe('InMemoryEventLogger', () => {
 	it('should return empty array when filter has no match', async () => {
 		const logger = new InMemoryEventLogger()
 
-		await logger.emit({ type: 'workflow:start', payload: { blueprintId: 'test' } })
+		await logger.emit({
+			type: 'workflow:start',
+			payload: { blueprintId: 'test', executionId: 'exec-1' },
+		})
 
 		const errors = logger.filter('node:error')
 		expect(errors).toEqual([])
@@ -88,8 +132,14 @@ describe('InMemoryEventLogger', () => {
 			type: 'workflow:start',
 			payload: { blueprintId: 'test', executionId: 'e1' },
 		})
-		await logger.emit({ type: 'node:start', payload: { nodeId: 'A', input: { x: 1 } } })
-		await logger.emit({ type: 'node:finish', payload: { nodeId: 'A', result: { output: 1 } } })
+		await logger.emit({
+			type: 'node:start',
+			payload: { nodeId: 'A', input: { x: 1 }, executionId: 'e1', blueprintId: 'test' },
+		})
+		await logger.emit({
+			type: 'node:finish',
+			payload: { nodeId: 'A', result: { output: 1 }, executionId: 'e1', blueprintId: 'test' },
+		})
 		await logger.emit({
 			type: 'workflow:finish',
 			payload: { blueprintId: 'test', executionId: 'e1', status: 'completed', errors: [] },
@@ -129,7 +179,13 @@ describe('InMemoryEventLogger', () => {
 
 		await logger.emit({
 			type: 'context:change',
-			payload: { op: 'set', key: 'myKey', value: 'myValue', sourceNode: 'A' },
+			payload: {
+				op: 'set',
+				key: 'myKey',
+				value: 'myValue',
+				sourceNode: 'A',
+				executionId: 'exec-1',
+			},
 		})
 
 		logger.printLog()
@@ -146,7 +202,7 @@ describe('InMemoryEventLogger', () => {
 
 		await logger.emit({
 			type: 'context:change',
-			payload: { op: 'delete', key: 'myKey', sourceNode: 'A' },
+			payload: { op: 'delete', key: 'myKey', sourceNode: 'A', executionId: 'exec-1' },
 		})
 
 		logger.printLog()
@@ -162,7 +218,12 @@ describe('InMemoryEventLogger', () => {
 
 		await logger.emit({
 			type: 'node:error',
-			payload: { nodeId: 'A', error: new Error('Test error') },
+			payload: {
+				nodeId: 'A',
+				error: new FlowcraftError('Test error'),
+				executionId: 'exec-1',
+				blueprintId: 'test',
+			},
 		})
 
 		logger.printLog()
@@ -180,7 +241,7 @@ describe('InMemoryEventLogger', () => {
 		await logger.emit({
 			type: 'custom:event',
 			payload: { custom: 'data' },
-		})
+		} as unknown as FlowcraftEvent)
 
 		logger.printLog()
 
@@ -192,7 +253,7 @@ describe('InMemoryEventLogger', () => {
 		const logger = new InMemoryEventLogger()
 		const event: FlowcraftEvent = {
 			type: 'node:start',
-			payload: { nodeId: 'A' },
+			payload: { nodeId: 'A', executionId: 'exec-1', input: {}, blueprintId: 'test' },
 		}
 
 		await logger.emit(event)

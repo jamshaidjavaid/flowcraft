@@ -161,7 +161,7 @@ export class WorkflowLogicHandler {
 		}
 
 		const finalInput = hasEdgeTransform
-			? this.evaluator.evaluate(edge.transform, {
+			? this.evaluator.evaluate(edge.transform!, {
 					input: sourceOutput,
 					context: await asyncContext.toJSON(),
 				})

@@ -30,10 +30,18 @@ describe('InMemoryEventStore', () => {
 		const store = new InMemoryEventStore()
 		const events: FlowcraftEvent[] = [
 			{ type: 'workflow:start', payload: { blueprintId: 'test', executionId: 'exec-1' } },
-			{ type: 'node:start', payload: { nodeId: 'A', executionId: 'exec-1' } },
+			{
+				type: 'node:start',
+				payload: { nodeId: 'A', executionId: 'exec-1', input: {}, blueprintId: 'test' },
+			},
 			{
 				type: 'node:finish',
-				payload: { nodeId: 'A', result: { output: 1 }, executionId: 'exec-1' },
+				payload: {
+					nodeId: 'A',
+					result: { output: 1 },
+					executionId: 'exec-1',
+					blueprintId: 'test',
+				},
 			},
 		]
 
@@ -121,7 +129,12 @@ describe('PersistentEventBusAdapter', () => {
 
 		await adapter.emit({
 			type: 'node:finish',
-			payload: { nodeId: 'A', result: { output: 1 }, executionId: 'my-exec' },
+			payload: {
+				nodeId: 'A',
+				result: { output: 1 },
+				executionId: 'my-exec',
+				blueprintId: 'test',
+			},
 		})
 
 		const events = await store.retrieve('my-exec')
@@ -134,7 +147,7 @@ describe('PersistentEventBusAdapter', () => {
 
 		await adapter.emit({
 			type: 'workflow:start',
-			payload: { blueprintId: 'test' },
+			payload: { blueprintId: 'test', executionId: 'unknown' },
 		})
 
 		const events = await store.retrieve('unknown')
@@ -149,10 +162,13 @@ describe('PersistentEventBusAdapter', () => {
 			type: 'workflow:start',
 			payload: { blueprintId: 'test', executionId: 'e1' },
 		})
-		await adapter.emit({ type: 'node:start', payload: { nodeId: 'A', executionId: 'e1' } })
+		await adapter.emit({
+			type: 'node:start',
+			payload: { nodeId: 'A', executionId: 'e1', input: {}, blueprintId: 'test' },
+		})
 		await adapter.emit({
 			type: 'node:finish',
-			payload: { nodeId: 'A', result: { output: 1 }, executionId: 'e1' },
+			payload: { nodeId: 'A', result: { output: 1 }, executionId: 'e1', blueprintId: 'test' },
 		})
 		await adapter.emit({
 			type: 'workflow:finish',
