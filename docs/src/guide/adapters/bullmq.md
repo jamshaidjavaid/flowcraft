@@ -78,7 +78,8 @@ const adapter = new BullMQAdapter({
 	coordinationStore,
 	connection: redisConnection,
 	queueName: 'my-workflow-queue', // Optional: defaults to 'flowcraft-queue'
-	stateTtlSeconds: 86400, // Optional: TTL for state/status keys after run completion (default: 86400 / 24h). Set to 0 to persist indefinitely
+
+	retryMode: 'queue', // Optional: delegates retries to BullMQ natively (defaults to 'in-process')
 })
 
 // 6. Start the worker to begin processing jobs
@@ -199,6 +200,16 @@ app.post('/webhooks/:runId/:nodeId', async (req, res) => {
 	}
 })
 ```
+
+## Queue-Native Retries
+
+By default, Flowcraft retries failing nodes synchronously inside the worker process. In distributed environments, this can hold worker concurrency slots hostage during backoff delays.
+
+The BullMQ adapter supports offloading retries to BullMQ's native attempts and backoff scheduling by setting `retryMode: 'queue'`. When enabled:
+
+1. **Non-blocking Backoff**: The worker immediately finishes the job on failure; BullMQ schedules the next attempt without keeping the worker process busy.
+2. **Exponential Backoff**: Uses the node's `maxRetries` and `retryDelay` to configure BullMQ's `attempts` and `backoff` settings.
+3. **Idempotency Guard**: Automatically skips execution if a node's output already exists in the context, preventing redundant work on retries.
 
 ## Key Retention
 

@@ -204,3 +204,15 @@ const v2Blueprint: WorkflowBlueprint = {
 ```
 
 During deployment, workflows started with v1.0.0 will only be processed by v1.0.0 workers, while new workflows can use v2.0.0. This prevents state corruption and ensures reliable operation during updates.
+
+## Distributed Retries
+
+By default, Flowcraft retries failing nodes synchronously inside the worker process. In distributed environments, this is often undesirable as it holds worker concurrency slots hostage during backoff delays.
+
+### `retryMode: 'queue'`
+
+Adapters can optionally support offloading retries to the message queue's native mechanisms. When enabled, the worker does not wait or loop on failure; instead, it rethrows or rejects the job, allowing the queue to schedule the next attempt with its built-in backoff logic.
+
+- **Workers** remain free to process other jobs.
+- **Observability** is improved as each retry is a distinct job attempt.
+- **Stability** is ensured through idempotency guards that skip re-execution if a node's output was already persisted.
