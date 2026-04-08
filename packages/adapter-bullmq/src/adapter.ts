@@ -1,4 +1,4 @@
-import type { ConnectionOptions, Job } from 'bullmq'
+import type { ConnectionOptions, DefaultJobOptions, Job } from 'bullmq'
 import { Queue, Worker } from 'bullmq'
 import type { AdapterOptions, JobPayload, NodeDefinition } from 'flowcraft'
 import { BaseDistributedAdapter } from 'flowcraft'
@@ -14,6 +14,18 @@ const DEFAULT_STATE_TTL_SECONDS = 86400
 export interface BullMQAdapterOptions extends AdapterOptions {
 	connection: RedisOptions | Redis
 	queueName?: string
+	/**
+	 * Allows BullMQ native job options applied to every job in the queue.
+	 * 
+	 * Use this to configure retention (`removeOnComplete`, `removeOnFail`)
+	 * and other BullMQ-specific behaviors.
+	 *
+	 * @defaultValue {
+	 *   removeOnComplete: 60 * 60 * 24 * 7, // 1 week
+	 *   removeOnFail: 60 * 60 * 24 * 15, // 15 days
+	 * }
+	 */
+	defaultJobOptions?: DefaultJobOptions
 	/**
 	 * How long (in seconds) workflow state and status keys are retained in Redis
 	 * after a run completes or fails.
@@ -59,6 +71,11 @@ export class BullMQAdapter extends BaseDistributedAdapter {
 		this.retryMode = options.retryMode || 'in-process'
 		this.queue = new Queue(this.queueName, {
 			connection: this.redisClient as ConnectionOptions,
+			defaultJobOptions: {
+				removeOnComplete: { age: 60 * 60 * 24 * 7 },
+				removeOnFail: { age: 60 * 60 * 24 * 15 },
+				...(options.defaultJobOptions || {}),
+			},
 		})
 		this.logger.info(`[BullMQAdapter] Connected to queue '${this.queueName}'.`)
 	}
