@@ -81,11 +81,6 @@ const expenseFlow = createFlow('expense-report-pipeline')
 	.edge('route-by-total', 'auto-reject', { condition: 'route-by-total.total > 2000' })
 	// 5a. HITL: Manager approval required ($500-$2000)
 	.wait('wait-manager')
-	.node('process-approval', async ({ input }) => {
-		await new Promise((r) => setTimeout(r, LAG))
-		const status = input?.approved ? 'approved' : 'denied'
-		return { output: { status, method: 'manager' } }
-	})
 	// 5b. Auto-approve path (under $500)
 	.node('auto-approve', async () => ({
 		output: { status: 'approved', method: 'auto' },
@@ -104,9 +99,8 @@ const expenseFlow = createFlow('expense-report-pipeline')
 		{ config: { joinStrategy: 'any' } },
 	)
 	// Wire convergence
-	.edge('wait-manager', 'process-approval')
+	.edge('wait-manager', 'send-notification')
 	.edge('auto-approve', 'send-notification')
-	.edge('process-approval', 'send-notification')
 	.edge('auto-reject', 'send-notification')
 
 const positionsMap = {
@@ -114,12 +108,11 @@ const positionsMap = {
 	'validate-items': { x: 0, y: 300 },
 	'compute-total': { x: 0, y: 450 },
 	'enhance-ocr': { x: 150, y: 650 },
-	'route-by-total': { x: 450, y: 500 },
+	'route-by-total': { x: 430, y: 500 },
 	'wait-manager': { x: 700, y: 300 },
-	'process-approval': { x: 950, y: 280 },
 	'auto-approve': { x: 700, y: 430 },
 	'auto-reject': { x: 700, y: 540 },
-	'send-notification': { x: 1100, y: 480 },
+	'send-notification': { x: 1000, y: 430 },
 }
 const typesMap = {
 	'fetch-report': 'input',
@@ -128,7 +121,6 @@ const typesMap = {
 	'enhance-ocr': 'default',
 	'route-by-total': 'default',
 	'wait-manager': 'default',
-	'process-approval': 'default',
 	'auto-approve': 'default',
 	'auto-reject': 'default',
 	'send-notification': 'output',
@@ -136,7 +128,7 @@ const typesMap = {
 </script>
 
 <template>
-	<div class="flowcraft-flow h-120!">
+	<div class="flowcraft-flow h-110!">
 		<Flow :flow="expenseFlow" :positions-map :types-map />
 	</div>
 </template>
