@@ -1,5 +1,16 @@
 # @flowcraft/bullmq-adapter
 
+## 1.6.0
+
+### Minor Changes
+
+- Implement queue-native retries and idempotency guards, delegating retries from process nodes to distributed workers where they can be implemented.
+
+### Patch Changes
+
+- Updated dependencies
+    - flowcraft@2.10.0
+
 ## 1.5.0
 
 ### Minor Changes
