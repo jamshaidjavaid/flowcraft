@@ -16,7 +16,7 @@ export interface BullMQAdapterOptions extends AdapterOptions {
 	queueName?: string
 	/**
 	 * Allows BullMQ native job options applied to every job in the queue.
-	 * 
+	 *
 	 * Use this to configure retention (`removeOnComplete`, `removeOnFail`)
 	 * and other BullMQ-specific behaviors.
 	 *
@@ -74,7 +74,7 @@ export class BullMQAdapter extends BaseDistributedAdapter {
 			defaultJobOptions: {
 				removeOnComplete: { age: 60 * 60 * 24 * 7 },
 				removeOnFail: { age: 60 * 60 * 24 * 15 },
-				...(options.defaultJobOptions || {}),
+				...options.defaultJobOptions,
 			},
 		})
 		this.logger.info(`[BullMQAdapter] Connected to queue '${this.queueName}'.`)

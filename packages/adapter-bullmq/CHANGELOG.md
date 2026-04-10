@@ -1,5 +1,11 @@
 # @flowcraft/bullmq-adapter
 
+## 1.7.0
+
+### Minor Changes
+
+- Support global defaultJobOptions configuration with optimized retentions
+
 ## 1.6.0
 
 ### Minor Changes

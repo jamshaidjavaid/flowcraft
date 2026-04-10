@@ -379,7 +379,7 @@ describe('BullMQAdapter - Default Job Options', () => {
 
 		await (adapter as any).enqueueJob(job)
 		const waitingJobs = await (adapter as any).queue.getWaiting()
-		
+
 		expect(waitingJobs.length).toBe(1)
 		expect(waitingJobs[0].opts.removeOnComplete).toBe(true)
 		expect(waitingJobs[0].opts.removeOnFail).toBe(1000)

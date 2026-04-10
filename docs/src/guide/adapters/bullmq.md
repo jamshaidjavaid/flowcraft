@@ -229,6 +229,7 @@ After a workflow run completes or fails, the adapter applies a TTL to both `work
 You can configure global options for all jobs added to the queue via the `defaultJobOptions` configuration. The adapter supports the entire native BullMQ `DefaultJobOptions` interface, allowing you to configure priorities, backoffs, attempts, and retention policies.
 
 To balance observability and memory usage, the adapter applies the following job retentions by default:
+
 - **`removeOnComplete`**: `{ age: 604800 }` (1 week)
 - **`removeOnFail`**: `{ age: 1296000 }` (15 days)
 
