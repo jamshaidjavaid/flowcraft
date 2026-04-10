@@ -80,6 +80,11 @@ const adapter = new BullMQAdapter({
 	queueName: 'my-workflow-queue', // Optional: defaults to 'flowcraft-queue'
 
 	retryMode: 'queue', // Optional: delegates retries to BullMQ natively (defaults to 'in-process')
+	defaultJobOptions: {
+		// Optional: configure any native BullMQ 'DefaultJobOptions'
+		removeOnComplete: true, // e.g., override the default 1-week retention
+		removeOnFail: true, // e.g., override the default 15-day retention
+	},
 })
 
 // 6. Start the worker to begin processing jobs
@@ -218,6 +223,16 @@ After a workflow run completes or fails, the adapter applies a TTL to both `work
 - **`stateTtlSeconds`**: Controls how long (in seconds) state and status keys are retained. Defaults to `86400` (24 hours).
 - Set to `0` to persist keys indefinitely (not recommended for production).
 - Coordination keys (`fanin:*`, `joinlock:*`, `blueprint:*`) already use their own TTLs and are unaffected.
+
+## Default Job Options
+
+You can configure global options for all jobs added to the queue via the `defaultJobOptions` configuration. The adapter supports the entire native BullMQ `DefaultJobOptions` interface, allowing you to configure priorities, backoffs, attempts, and retention policies.
+
+To balance observability and memory usage, the adapter applies the following job retentions by default:
+- **`removeOnComplete`**: `{ age: 604800 }` (1 week)
+- **`removeOnFail`**: `{ age: 1296000 }` (15 days)
+
+You can easily override these or add other native options by passing your own `defaultJobOptions` object.
 
 ## Key Components
 

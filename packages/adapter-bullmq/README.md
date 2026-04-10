@@ -59,6 +59,11 @@ const adapter = new BullMQAdapter({
 	connection: redisConnection,
 	queueName: 'my-workflow-queue', // Optional: defaults to 'flowcraft-queue'
 	retryMode: 'queue', // Optional: delegates maxRetries to BullMQ natively (defaults to 'in-process')
+	defaultJobOptions: {
+		// Optional: configure any native BullMQ DefaultJobOptions
+		removeOnComplete: true, // e.g., override the default 1-week retention
+		removeOnFail: true, // e.g., override the default 15-day retention
+	},
 })
 
 // 6. Start the worker to begin processing jobs

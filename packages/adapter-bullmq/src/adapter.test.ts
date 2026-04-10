@@ -343,3 +343,47 @@ describe('BullMQAdapter - Retry Mode', () => {
 		await adapter.close()
 	})
 })
+
+describe('BullMQAdapter - Default Job Options', () => {
+	let redisContainer: StartedRedisContainer
+	let redis: Redis
+
+	beforeAll(async () => {
+		redisContainer = await new RedisContainer('redis:8.2.2').start()
+		redis = new Redis(redisContainer.getConnectionUrl())
+	}, 30000)
+
+	afterAll(async () => {
+		await redis.quit()
+		await redisContainer.stop()
+	})
+
+	it('should support defaultJobOptions for configuring job retention policies', async () => {
+		const coordinationStore = new RedisCoordinationStore(redis)
+		const adapter = new BullMQAdapter({
+			connection: redis,
+			queueName: 'default-job-opts-test',
+			coordinationStore,
+			runtimeOptions: {},
+			defaultJobOptions: {
+				removeOnComplete: true,
+				removeOnFail: 1000,
+			},
+		})
+
+		const job: JobPayload = {
+			runId: 'run-job-opts',
+			blueprintId: 'test-bp-opts',
+			nodeId: 'A',
+		}
+
+		await (adapter as any).enqueueJob(job)
+		const waitingJobs = await (adapter as any).queue.getWaiting()
+		
+		expect(waitingJobs.length).toBe(1)
+		expect(waitingJobs[0].opts.removeOnComplete).toBe(true)
+		expect(waitingJobs[0].opts.removeOnFail).toBe(1000)
+
+		await adapter.close()
+	})
+})
