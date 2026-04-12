@@ -143,4 +143,29 @@ describe('PostgresHistoryAdapter - Testcontainers Integration', () => {
 		stats = await adapter.getStats()
 		expect(stats.totalEvents).toBe(0)
 	})
+
+	it('should lazy initialize when autoCreateTables is false', async () => {
+		const lazyAdapter = new PostgresHistoryAdapter({
+			host: postgresContainer.getHost(),
+			port: postgresContainer.getPort(),
+			user: postgresContainer.getUsername(),
+			password: postgresContainer.getPassword(),
+			database: postgresContainer.getDatabase(),
+			tableName: `test_lazy_${Date.now()}`,
+			autoCreateTables: false,
+		})
+
+		await lazyAdapter.initializeTables()
+		await lazyAdapter.store({ type: 'workflow:start', payload: {} }, 'exec-1')
+		const events = await lazyAdapter.retrieve('exec-1')
+		expect(events).toHaveLength(1)
+
+		await lazyAdapter.dropTable()
+		await lazyAdapter.close()
+	})
+
+	it('should expose pool via getPool', async () => {
+		const pool = adapter.getPool()
+		expect(pool).toBeDefined()
+	})
 })
