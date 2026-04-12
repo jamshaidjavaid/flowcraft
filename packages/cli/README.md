@@ -1,5 +1,9 @@
 # @flowcraft/cli
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![NPM Version](https://img.shields.io/npm/v/@flowcraft/cli.svg)](https://www.npmjs.com/package/@flowcraft/cli)
+[![Codecov](https://img.shields.io/codecov/c/github/gorango/flowcraft/cli)](https://codecov.io/github/gorango/flowcraft)
+
 Command-line interface for Flowcraft workflow observability and debugging.
 
 ## Installation
@@ -174,3 +178,7 @@ Create a `.flowcraft.json` file in your project directory or `~/.flowcraft/confi
 - `flowcraft reconcile <run-id>`: Manually trigger reconciliation for stuck workflows
 - `flowcraft inspect --web`: Launch web UI for richer visualization
 - `flowcraft compare <run-id-1> <run-id-2>`: Compare two workflow executions
+
+## License
+
+This package is licensed under the [MIT License](https://github.com/gorango/flowcraft/blob/master/LICENSE).

@@ -1,7 +1,8 @@
 # @flowcraft/cloudflare-adapter
 
-[![NPM Version](https://img.shields.io/npm/v/@flowcraft/cloudflare-adapter.svg)](https://www.npmjs.com/package/@flowcraft/cloudflare-adapter)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![NPM Version](https://img.shields.io/npm/v/@flowcraft/cloudflare-adapter.svg)](https://www.npmjs.com/package/@flowcraft/cloudflare-adapter)
+[![Codecov](https://img.shields.io/codecov/c/github/gorango/flowcraft/adapter-cloudflare)](https://codecov.io/github/gorango/flowcraft)
 
 A distributed adapter for [Flowcraft](https://www.npmjs.com/package/flowcraft) that uses Cloudflare Queues, Durable Objects, and KV for workflow execution in Cloudflare Workers.
 
@@ -223,4 +224,4 @@ Unlike other Flowcraft adapters that use Docker-based Testcontainers for testing
 
 ## License
 
-This package is licensed under the [MIT License](LICENSE).
+This package is licensed under the [MIT License](https://github.com/gorango/flowcraft/blob/master/LICENSE).

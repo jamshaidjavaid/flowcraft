@@ -1,5 +1,9 @@
 # @flowcraft/postgres-history
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![NPM Version](https://img.shields.io/npm/v/@flowcraft/postgres-history.svg)](https://www.npmjs.com/package/@flowcraft/postgres-history)
+[![Codecov](https://img.shields.io/codecov/c/github/gorango/flowcraft/history-postgres)](https://codecov.io/github/gorango/flowcraft)
+
 PostgreSQL-based event store for Flowcraft workflow observability.
 
 ## Installation
@@ -83,3 +87,7 @@ CREATE INDEX idx_flowcraft_events_execution_id ON flowcraft_events(execution_id)
 CREATE INDEX idx_flowcraft_events_event_type ON flowcraft_events(event_type);
 CREATE INDEX idx_flowcraft_events_timestamp ON flowcraft_events(timestamp);
 ```
+
+## License
+
+This package is licensed under the [MIT License](https://github.com/gorango/flowcraft/blob/master/LICENSE).

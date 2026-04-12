@@ -1,7 +1,8 @@
 # Flowcraft Adapter for Kafka & Cassandra
 
-[![NPM Version](https://img.shields.io/npm/v/@flowcraft/kafka-adapter.svg)](https://www.npmjs.com/package/@flowcraft/kafka-adapter)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![NPM Version](https://img.shields.io/npm/v/@flowcraft/kafka-adapter.svg)](https://www.npmjs.com/package/@flowcraft/kafka-adapter)
+[![Codecov](https://img.shields.io/codecov/c/github/gorango/flowcraft/adapter-kafka)](https://codecov.io/github/gorango/flowcraft)
 
 This package provides a distributed adapter for [Flowcraft](https://www.npmjs.com/package/flowcraft) designed for high-throughput environments. It uses Apache Kafka for streaming job processing, Apache Cassandra for scalable and fault-tolerant state persistence, and Redis for high-performance coordination.
 
@@ -159,4 +160,4 @@ This ensures that workflows can be resumed even after worker failures or restart
 
 ## License
 
-This package is licensed under the [MIT License](LICENSE).
+This package is licensed under the [MIT License](https://github.com/gorango/flowcraft/blob/master/LICENSE).

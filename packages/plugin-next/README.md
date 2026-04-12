@@ -1,5 +1,8 @@
 # @flowcraft/next-plugin
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![NPM Version](https://img.shields.io/npm/v/@flowcraft/next-plugin.svg)](https://www.npmjs.com/package/@flowcraft/next-plugin)
+
 Next.js plugin for automatic Flowcraft workflow compilation.
 
 ## Installation
@@ -35,3 +38,7 @@ npx @flowcraft/compiler --watch
 ```
 
 See the [@flowcraft/compiler README](../compiler/README.md) for more details.
+
+## License
+
+This package is licensed under the [MIT License](https://github.com/gorango/flowcraft/blob/master/LICENSE).

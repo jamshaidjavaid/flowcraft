@@ -1,7 +1,8 @@
 # Flowcraft Adapter for AWS SQS & DynamoDB
 
-[![NPM Version](https://img.shields.io/npm/v/@flowcraft/sqs-adapter.svg)](https://www.npmjs.com/package/@flowcraft/sqs-adapter)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![NPM Version](https://img.shields.io/npm/v/@flowcraft/sqs-adapter.svg)](https://www.npmjs.com/package/@flowcraft/sqs-adapter)
+[![Codecov](https://img.shields.io/codecov/c/github/gorango/flowcraft/adapter-sqs)](https://codecov.io/github/gorango/flowcraft)
 
 This package provides a distributed adapter for [Flowcraft](https://www.npmjs.com/package/flowcraft) that is deeply integrated with Amazon Web Services (AWS). It uses AWS Simple Queue Service (SQS) for reliable job queuing and AWS DynamoDB for scalable, low-latency state persistence and coordination.
 
@@ -181,5 +182,5 @@ This ensures that workflows can be resumed even after worker failures or restart
 
 ## License
 
-This package is licensed under the [MIT License](LICENSE).
+This package is licensed under the [MIT License](https://github.com/gorango/flowcraft/blob/master/LICENSE).
 ````

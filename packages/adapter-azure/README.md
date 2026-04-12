@@ -1,7 +1,8 @@
 # Flowcraft Adapter for Azure
 
-[![NPM Version](https://img.shields.io/npm/v/@flowcraft/azure-adapter.svg)](https://www.npmjs.com/package/@flowcraft/azure-adapter)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![NPM Version](https://img.shields.io/npm/v/@flowcraft/azure-adapter.svg)](https://www.npmjs.com/package/@flowcraft/azure-adapter)
+[![Codecov](https://img.shields.io/codecov/c/github/gorango/flowcraft/adapter-azure)](https://codecov.io/github/gorango/flowcraft)
 
 This package provides a distributed adapter for [Flowcraft](https://www.npmjs.com/package/flowcraft) that leverages Microsoft Azure services. It uses Azure Queue Storage for robust job queuing, Azure Cosmos DB for scalable state persistence, and a Redis instance for high-performance coordination tasks.
 
@@ -183,4 +184,4 @@ This ensures that workflows can be resumed even after worker failures or restart
 
 ## License
 
-This package is licensed under the [MIT License](LICENSE).
+This package is licensed under the [MIT License](https://github.com/gorango/flowcraft/blob/master/LICENSE).

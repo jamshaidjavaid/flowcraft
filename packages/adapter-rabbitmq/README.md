@@ -1,7 +1,8 @@
 # Flowcraft Adapter for RabbitMQ & PostgreSQL
 
-[![NPM Version](https://img.shields.io/npm/v/@flowcraft/rabbitmq-adapter.svg)](https://www.npmjs.com/package/@flowcraft/rabbitmq-adapter)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![NPM Version](https://img.shields.io/npm/v/@flowcraft/rabbitmq-adapter.svg)](https://www.npmjs.com/package/@flowcraft/rabbitmq-adapter)
+[![Codecov](https://img.shields.io/codecov/c/github/gorango/flowcraft/adapter-rabbitmq)](https://codecov.io/github/gorango/flowcraft)
 
 This package provides a distributed adapter for [Flowcraft](https://www.npmjs.com/package/flowcraft) that leverages a traditional and reliable enterprise messaging stack. It uses RabbitMQ for message-based job queuing, PostgreSQL for transactional state persistence, and Redis for high-performance coordination.
 
@@ -158,4 +159,4 @@ This ensures that workflows can be resumed even after worker failures or restart
 
 ## License
 
-This package is licensed under the [MIT License](LICENSE).
+This package is licensed under the [MIT License](https://github.com/gorango/flowcraft/blob/master/LICENSE).

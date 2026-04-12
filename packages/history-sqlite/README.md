@@ -1,5 +1,9 @@
 # @flowcraft/sqlite-history
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![NPM Version](https://img.shields.io/npm/v/@flowcraft/sqlite-history.svg)](https://www.npmjs.com/package/@flowcraft/sqlite-history)
+[![Codecov](https://img.shields.io/codecov/c/github/gorango/flowcraft/history-sqlite)](https://codecov.io/github/gorango/flowcraft)
+
 SQLite-based event store for Flowcraft workflow observability.
 
 ## Installation
@@ -54,3 +58,7 @@ Implements the `IEventStore` interface with the following methods:
 - `close()`: Close database connection
 - `clear()`: Clear all events (for testing)
 - `getStats()`: Get database statistics
+
+## License
+
+This package is licensed under the [MIT License](https://github.com/gorango/flowcraft/blob/master/LICENSE).

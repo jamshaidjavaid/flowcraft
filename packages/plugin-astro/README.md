@@ -1,5 +1,8 @@
 # @flowcraft/astro-integration
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![NPM Version](https://img.shields.io/npm/v/@flowcraft/astro-integration.svg)](https://www.npmjs.com/package/@flowcraft/astro-integration)
+
 Astro integration for automatic Flowcraft workflow compilation.
 
 ## Installation
@@ -37,3 +40,7 @@ The integration accepts the same options as the Flowcraft compiler:
 - `exclude`: Glob patterns to exclude (default: `['**/node_modules/**']`)
 
 See the [@flowcraft/compiler README](../compiler/README.md) for detailed configuration options.
+
+## License
+
+This package is licensed under the [MIT License](https://github.com/gorango/flowcraft/blob/master/LICENSE).

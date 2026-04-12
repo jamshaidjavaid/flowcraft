@@ -1,7 +1,8 @@
 # Flowcraft Adapter for Vercel
 
-[![NPM Version](https://img.shields.io/npm/v/@flowcraft/vercel-adapter.svg)](https://www.npmjs.com/package/@flowcraft/vercel-adapter)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![NPM Version](https://img.shields.io/npm/v/@flowcraft/vercel-adapter.svg)](https://www.npmjs.com/package/@flowcraft/vercel-adapter)
+[![Codecov](https://img.shields.io/codecov/c/github/gorango/flowcraft/adapter-vercel)](https://codecov.io/github/gorango/flowcraft)
 
 This package provides a distributed adapter for [Flowcraft](https://www.npmjs.com/package/flowcraft) that is deeply integrated with Vercel's serverless infrastructure. It uses **Vercel Queues** for event-driven job queuing and **Redis** (e.g., Upstash via Vercel Marketplace) for scalable state persistence and coordination.
 
@@ -131,4 +132,4 @@ console.log(`Reconciled ${stats.reconciledRuns} of ${stats.stalledRuns} stalled 
 
 ## License
 
-This package is licensed under the [MIT License](LICENSE).
+This package is licensed under the [MIT License](https://github.com/gorango/flowcraft/blob/master/LICENSE).

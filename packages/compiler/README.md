@@ -1,7 +1,8 @@
 # `@flowcraft/compiler`
 
-[![NPM Version](https://img.shields.io/npm/v/@flowcraft/compiler.svg)](https://www.npmjs.com/package/@flowcraft/compiler)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![NPM Version](https://img.shields.io/npm/v/@flowcraft/compiler.svg)](https://www.npmjs.com/package/@flowcraft/compiler)
+[![Codecov](https://img.shields.io/codecov/c/github/gorango/flowcraft/compiler)](https://codecov.io/github/gorango/flowcraft)
 
 The `@flowcraft/compiler` is an optional, opt-in toolchain that transforms intuitive, imperative TypeScript code into a declarative Flowcraft workflow blueprint. It gives you the best of both worlds: a natural developer experience using standard language features and a powerful, serializable, and predictable graph-based execution model at runtime.
 
@@ -616,3 +617,7 @@ export async function typeErrorFlow() {
     - `registry: Record<string, { importPath: string, exportName: string }>`: A map of step names to their import locations.
     - `diagnostics: CompilationDiagnostic[]`: An array of errors or warnings found during compilation.
     - `manifestSource: string`: The generated source code for the manifest file.
+
+## License
+
+This package is licensed under the [MIT License](https://github.com/gorango/flowcraft/blob/master/LICENSE).
