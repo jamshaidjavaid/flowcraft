@@ -1,5 +1,5 @@
 import type { FlowcraftEvent, IEventStore } from 'flowcraft'
-import { Pool, type PoolConfig } from 'pg'
+import { Pool, type PoolClient, type PoolConfig } from 'pg'
 
 export interface PostgresHistoryOptions extends PoolConfig {
 	/**
@@ -21,16 +21,36 @@ export class PostgresHistoryAdapter implements IEventStore {
 	private tableName: string
 	private sequenceName: string
 	private tablesInitialized = false
+	private initPromise: Promise<void> | null = null
 
 	constructor(options: PostgresHistoryOptions) {
 		const { tableName = 'flowcraft_events', autoCreateTables = true, ...poolConfig } = options
 
 		this.pool = new Pool(poolConfig)
 		this.tableName = tableName
-		this.sequenceName = `seq_${process.hrtime.bigint()}`
+		this.sequenceName = `${tableName}_seq`
 
 		if (autoCreateTables) {
-			this.initializeTables()
+			this.initPromise = this.initializeTables()
+		}
+	}
+
+	private async withClient<T>(fn: (client: PoolClient) => Promise<T>): Promise<T> {
+		const client = await this.pool.connect()
+		try {
+			return await fn(client)
+		} finally {
+			client.release()
+		}
+	}
+
+	private async ensureInitialized(): Promise<void> {
+		if (this.tablesInitialized) {
+			return
+		}
+		if (this.initPromise) {
+			await this.initPromise
+			this.tablesInitialized = true
 		}
 	}
 
@@ -39,65 +59,55 @@ export class PostgresHistoryAdapter implements IEventStore {
 			return
 		}
 
-		const client = await this.pool.connect()
+		if (this.initPromise) {
+			return this.initPromise
+		}
 
-		try {
-			try {
-				await client.query(`CREATE SEQUENCE IF NOT EXISTS ${this.sequenceName}`)
-			} catch {}
+		this.initPromise = this.withClient(async (client) => {
+			await client.query(`CREATE SEQUENCE IF NOT EXISTS ${this.sequenceName}`)
 
-			try {
-				await client.query(`
-					CREATE TABLE IF NOT EXISTS ${this.tableName} (
-						id INTEGER PRIMARY KEY DEFAULT nextval('${this.sequenceName}'),
-						execution_id TEXT NOT NULL,
-						event_type TEXT NOT NULL,
-						event_payload JSONB NOT NULL,
-						timestamp TIMESTAMPTZ DEFAULT NOW(),
-						created_at TIMESTAMPTZ DEFAULT NOW()
-					)
-				`)
-			} catch {}
+			await client.query(`
+				CREATE TABLE IF NOT EXISTS ${this.tableName} (
+					id INTEGER PRIMARY KEY DEFAULT nextval('${this.sequenceName}'),
+					execution_id TEXT NOT NULL,
+					event_type TEXT NOT NULL,
+					event_payload JSONB NOT NULL,
+					timestamp TIMESTAMPTZ DEFAULT NOW(),
+					created_at TIMESTAMPTZ DEFAULT NOW()
+				)
+			`)
 
-			try {
-				await client.query(
-					`CREATE INDEX IF NOT EXISTS idx_${this.tableName}_execution_id ON ${this.tableName}(execution_id)`,
-				)
-			} catch {}
-			try {
-				await client.query(
-					`CREATE INDEX IF NOT EXISTS idx_${this.tableName}_event_type ON ${this.tableName}(event_type)`,
-				)
-			} catch {}
-			try {
-				await client.query(
-					`CREATE INDEX IF NOT EXISTS idx_${this.tableName}_event_type ON ${this.tableName}(event_type)`,
-				)
-			} catch {}
+			await client.query(
+				`CREATE INDEX IF NOT EXISTS idx_${this.tableName}_execution_id ON ${this.tableName}(execution_id)`,
+			)
+			await client.query(
+				`CREATE INDEX IF NOT EXISTS idx_${this.tableName}_event_type ON ${this.tableName}(event_type)`,
+			)
+			await client.query(
+				`CREATE INDEX IF NOT EXISTS idx_${this.tableName}_timestamp ON ${this.tableName}(timestamp)`,
+			)
 
 			this.tablesInitialized = true
-		} finally {
-			client.release()
-		}
+		})
+
+		return this.initPromise
 	}
 
 	async store(event: FlowcraftEvent, executionId: string): Promise<void> {
-		const client = await this.pool.connect()
+		await this.ensureInitialized()
 
-		try {
+		await this.withClient(async (client) => {
 			await client.query(
 				`INSERT INTO ${this.tableName} (execution_id, event_type, event_payload) VALUES ($1, $2, $3)`,
 				[executionId, event.type, JSON.stringify(event.payload)],
 			)
-		} finally {
-			client.release()
-		}
+		})
 	}
 
 	async retrieve(executionId: string): Promise<FlowcraftEvent[]> {
-		const client = await this.pool.connect()
+		await this.ensureInitialized()
 
-		try {
+		return this.withClient(async (client) => {
 			const result = await client.query(
 				`SELECT event_type, event_payload FROM ${this.tableName} WHERE execution_id = $1 ORDER BY timestamp ASC`,
 				[executionId],
@@ -107,21 +117,19 @@ export class PostgresHistoryAdapter implements IEventStore {
 				type: row.event_type as FlowcraftEvent['type'],
 				payload: row.event_payload,
 			}))
-		} finally {
-			client.release()
-		}
+		})
 	}
 
 	async retrieveMultiple(executionIds: string[]): Promise<Map<string, FlowcraftEvent[]>> {
+		await this.ensureInitialized()
+
 		const result = new Map<string, FlowcraftEvent[]>()
 
 		if (executionIds.length === 0) {
 			return result
 		}
 
-		const client = await this.pool.connect()
-
-		try {
+		return this.withClient(async (client) => {
 			const placeholders = executionIds.map((_, i) => `$${i + 1}`).join(',')
 			const query = `
 				SELECT execution_id, event_type, event_payload
@@ -150,9 +158,7 @@ export class PostgresHistoryAdapter implements IEventStore {
 			}
 
 			return result
-		} finally {
-			client.release()
-		}
+		})
 	}
 
 	/**
@@ -166,10 +172,10 @@ export class PostgresHistoryAdapter implements IEventStore {
 	 * Clear all events from the database (useful for testing).
 	 */
 	async clear(): Promise<void> {
-		const client = await this.pool.connect()
+		await this.ensureInitialized()
 
-		try {
-			const result = await client.query(
+		await this.withClient(async (client) => {
+			const tableExists = await client.query(
 				`
 					SELECT EXISTS (
 						SELECT 1 FROM information_schema.tables
@@ -179,51 +185,41 @@ export class PostgresHistoryAdapter implements IEventStore {
 				[this.tableName],
 			)
 
-			if (result.rows[0].exists) {
+			if (tableExists.rows[0].exists) {
 				await client.query(`DELETE FROM ${this.tableName}`)
 			}
-		} finally {
-			client.release()
-		}
+		})
 	}
 
 	/**
 	 * Get database statistics.
 	 */
 	async getStats(): Promise<{ totalEvents: number; executions: number }> {
-		await this.initializeTables()
+		await this.ensureInitialized()
 
-		const client = await this.pool.connect()
-
-		try {
-			const eventResult = await client.query(
-				`SELECT COUNT(*) as count FROM ${this.tableName}`,
-			)
-			const executionResult = await client.query(
-				`SELECT COUNT(DISTINCT execution_id) as count FROM ${this.tableName}`,
-			)
+		return this.withClient(async (client) => {
+			const [eventResult, executionResult] = await Promise.all([
+				client.query(`SELECT COUNT(*) as count FROM ${this.tableName}`),
+				client.query(`SELECT COUNT(DISTINCT execution_id) as count FROM ${this.tableName}`),
+			])
 
 			return {
 				totalEvents: parseInt(eventResult.rows[0].count, 10),
 				executions: parseInt(executionResult.rows[0].count, 10),
 			}
-		} finally {
-			client.release()
-		}
+		})
 	}
 
 	/**
 	 * Drop the events table (useful for testing).
 	 */
 	async dropTable(): Promise<void> {
-		const client = await this.pool.connect()
-
-		try {
+		await this.withClient(async (client) => {
 			await client.query(`DROP TABLE IF EXISTS ${this.tableName} CASCADE`)
 			await client.query(`DROP SEQUENCE IF EXISTS ${this.sequenceName}`)
-		} finally {
-			client.release()
-		}
+			this.tablesInitialized = false
+			this.initPromise = null
+		})
 	}
 
 	/**
