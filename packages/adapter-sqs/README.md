@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![NPM Version](https://img.shields.io/npm/v/@flowcraft/sqs-adapter.svg)](https://www.npmjs.com/package/@flowcraft/sqs-adapter)
-[![Codecov](https://img.shields.io/codecov/c/github/gorango/flowcraft/adapter-sqs)](https://codecov.io/github/gorango/flowcrafthttps://codecov.io/github/gorango/flowcraft/tree/master/packages/adapter-sqs/src?flags[0]=adapter-sqs)
+[![Codecov](https://img.shields.io/codecov/c/github/gorango/flowcraft/master?flag=adapter-sqs)](https://codecov.io/github/gorango/flowcrafthttps://codecov.io/github/gorango/flowcraft/tree/master/packages/adapter-sqs/src?flags[0]=adapter-sqs)
 
 This package provides a distributed adapter for [Flowcraft](https://www.npmjs.com/package/flowcraft) that is deeply integrated with Amazon Web Services (AWS). It uses AWS Simple Queue Service (SQS) for reliable job queuing and AWS DynamoDB for scalable, low-latency state persistence and coordination.
 

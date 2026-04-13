@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![NPM Version](https://img.shields.io/npm/v/@flowcraft/bullmq-adapter.svg)](https://www.npmjs.com/package/@flowcraft/bullmq-adapter)
-[![Codecov](https://img.shields.io/codecov/c/github/gorango/flowcraft/adapter-bullmq)](https://codecov.io/github/gorango/flowcraft/tree/master/packages/adapter-bullmq/src?flags[0]=adapter-bullmq)
+[![Codecov](https://img.shields.io/codecov/c/github/gorango/flowcraft/master?flag=adapter-bullmq)](https://codecov.io/github/gorango/flowcraft/tree/master/packages/adapter-bullmq/src?flags[0]=adapter-bullmq)
 
 This package provides a distributed adapter for [Flowcraft](https://www.npmjs.com/package/flowcraft) that leverages BullMQ. It uses Redis for highly efficient job queuing, state persistence, and coordination, making it a powerful and streamlined choice for distributed workflows.
 

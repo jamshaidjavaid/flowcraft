@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![NPM Version](https://img.shields.io/npm/v/@flowcraft/rabbitmq-adapter.svg)](https://www.npmjs.com/package/@flowcraft/rabbitmq-adapter)
-[![Codecov](https://img.shields.io/codecov/c/github/gorango/flowcraft/adapter-rabbitmq)](https://codecov.io/github/gorango/flowcrafthttps://codecov.io/github/gorango/flowcraft/tree/master/packages/adapter-rabbitmq/src?flags[0]=adapter-rabbitmq)
+[![Codecov](https://img.shields.io/codecov/c/github/gorango/flowcraft/master?flag=adapter-rabbitmq)](https://codecov.io/github/gorango/flowcrafthttps://codecov.io/github/gorango/flowcraft/tree/master/packages/adapter-rabbitmq/src?flags[0]=adapter-rabbitmq)
 
 This package provides a distributed adapter for [Flowcraft](https://www.npmjs.com/package/flowcraft) that leverages a traditional and reliable enterprise messaging stack. It uses RabbitMQ for message-based job queuing, PostgreSQL for transactional state persistence, and Redis for high-performance coordination.
 

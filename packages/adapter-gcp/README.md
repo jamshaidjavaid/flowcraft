@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![NPM Version](https://img.shields.io/npm/v/@flowcraft/gcp-adapter.svg)](https://www.npmjs.com/package/@flowcraft/gcp-adapter)
-[![Codecov](https://img.shields.io/codecov/c/github/gorango/flowcraft/adapter-gcp)](https://codecov.io/github/gorango/flowcraft/tree/master/packages/adapter-gcp/src?flags[0]=adapter-gcp)
+[![Codecov](https://img.shields.io/codecov/c/github/gorango/flowcraft/master?flag=adapter-gcp)](https://codecov.io/github/gorango/flowcraft/tree/master/packages/adapter-gcp/src?flags[0]=adapter-gcp)
 
 This package provides a distributed adapter for [Flowcraft](https://www.npmjs.com/package/flowcraft) that leverages Google Cloud services. It uses Google Cloud Pub/Sub for asynchronous messaging, Google Cloud Firestore for scalable state persistence, and a Redis instance for high-performance coordination.
 

@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![NPM Version](https://img.shields.io/npm/v/@flowcraft/cloudflare-adapter.svg)](https://www.npmjs.com/package/@flowcraft/cloudflare-adapter)
-[![Codecov](https://img.shields.io/codecov/c/github/gorango/flowcraft/adapter-cloudflare)](https://codecov.io/github/gorango/flowcraft/tree/master/packages/adapter-cloudflare/src?flags[0]=adapter-cloudflare)
+[![Codecov](https://img.shields.io/codecov/c/github/gorango/flowcraft/master?flag=adapter-cloudflare)](https://codecov.io/github/gorango/flowcraft/tree/master/packages/adapter-cloudflare/src?flags[0]=adapter-cloudflare)
 
 A distributed adapter for [Flowcraft](https://www.npmjs.com/package/flowcraft) that uses Cloudflare Queues, Durable Objects, and KV for workflow execution in Cloudflare Workers.
 
